@@ -192,8 +192,8 @@ class SAILnet(DictLearner):
         after each set of batch_size presentations.
         The learning rates are multiplied by rate_decay after each trial.
         """
-        self.actshistory = np.array((self.nunits, ntrials//self.store_every))
-        self.dQhistory = np.array((self.nunits, ntrials//self.store_every-1))
+        self.actshistory = np.zeros((self.nunits, ntrials//self.store_every))
+        self.dQhistory = np.zeros((self.nunits, ntrials//self.store_every-1))
 
         for t in range(ntrials):
             X = self.stims.rand_stim() #(256, 100) matrix, each column a ravelled patch

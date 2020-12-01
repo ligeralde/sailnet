@@ -10,3 +10,5 @@ whitening/Writeu*
 *egg*
 whitening/Figures*
 *.pyc
+SAILnet/.DS_Store
+.DS_Store
