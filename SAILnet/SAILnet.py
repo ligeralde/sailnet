@@ -19,9 +19,9 @@ simple cell receptive fields", PLoS Computational Biology 7(10).
 from __future__ import absolute_import, division, print_function
 import numpy as np
 import pickle
-from DictLearner import DictLearner
-from SAILnet import plotting
 
+from DictLearner import DictLearner
+import plotting
 
 class SAILnet(DictLearner):
     """
@@ -40,9 +40,9 @@ class SAILnet(DictLearner):
                  ninput=256,
                  nunits=256,
                  p=0.05,
-                 alpha=1.,
-                 beta=0.01,
-                 gamma=0.1,
+                 alpha=.1,
+                 beta=0.001,
+                 gamma=0.01,
                  theta0=0.5,
                  infrate=0.1,
                  moving_avg_rate=0.001,
@@ -113,6 +113,8 @@ class SAILnet(DictLearner):
         self.initialize_stats()
         self.corrmatrix_ave = self.p**2
         self.objhistory = np.array([])
+        self.actshistory = np.array([])
+        self.dQhistory = np.array([])
 
     def infer(self, X, infplot=False, savestr=None):
         """
@@ -190,19 +192,26 @@ class SAILnet(DictLearner):
         after each set of batch_size presentations.
         The learning rates are multiplied by rate_decay after each trial.
         """
-        for t in range(ntrials):
-            X = self.stims.rand_stim()
+        self.actshistory = np.array((nunits, ntrials//self.store_every))
+        self.dQhistory = np.array((nunits, ntrials//self.store_every-1))
 
-            acts = self.infer(X)
-            errors = np.mean(self.compute_errors(acts, X))
+        for t in range(ntrials):
+            X = self.stims.rand_stim() #(256, 100) matrix, each column a ravelled patch
+            acts = self.infer(X) #(1536, 100) matrix, each column the activities for every unit 
+            errors = np.mean(self.compute_errors(acts, X)) #(256, 100) matrix = X - Q^T * acts
             if t % self.store_every == 0:
                 corrmatrix = self.store_statistics(acts, errors)
                 self.objhistory = np.append(self.objhistory,
                     self.compute_objective(acts, X))
+                self.actshistory[:, t//self.store_every - 1] = np.mean(acts, axis=1)
+                Q = self.Q
             else:
                 corrmatrix = self.compute_corrmatrix(acts, errors, acts.mean(1))
 
             self.learn(X, acts, corrmatrix)
+
+            if t % self.store_every == 0:    
+                self.dQhistory[:, t//self.store_every] = np.mean(self.Q-Q, axis=1)
 
             if t % 50 == 0:
                 print("Trial number: " + str(t))
@@ -342,26 +351,44 @@ class SAILnet(DictLearner):
         This pickle file is then associated with this instance of SAILnet."""
         if filename is None:
             filename = self.paramfile
-        with open(filename, 'rb') as f:
-            self.Q, self.W, self.theta, rates, histories = pickle.load(f)
-        try:
-            (self.L0acts, self.L1acts, self.L2acts, self.L0hist,
-             self.L1hist, self.L2hist, self.corrmatrix_ave,
-             self.errorhist, self.objhistory) = histories
-        except:
-            # older files don't have as many statistics saved
-            try:
-                try:
-                    self.L0acts, self.L1acts, self.L2acts, self.corrmatrix_ave, self.errorhist, self.objhistory = histories
-                except ValueError:
-                    print("Loading old file. Some statistics unavailable.")
-                    try:
-                        self.L0acts, self.L1acts, self.corrmatrix_ave, self.errorhist, self.objhistory = histories
-                        assert len(self.L1acts.shape) < 2
-                    except AssertionError:
-                        self.L1acts, self.corrmatrix_ave, self.errorhist, self.objhistory, usage = histories
-                        self.L0acts = usage
-            except ValueError:
-                self.L1acts, self.corrmatrix_ave, self.errorhist, self.objhistory = histories
-        self.alpha, self.beta, self.gamma = rates
-        self.paramfile = filename
+        with open(filename, 'rb') as f: self.Q, param_dict, stat_dict = pickle.load(f) #self.theta, rates, histories = pickle.load(f)
+        self.theta = param_dict['theta']
+        self.W = param_dict['W']
+        self.alpha = param_dict['alpha']
+        self.beta = param_dict['beta']
+        self.gamma = param_dict['gamma']
+        self.infrate = param_dict['infrate']
+        self.nunits = param_dict['nunits']
+        self.p = param_dict['p']
+        self.L0acts = stat_dict['L0acts']
+        self.L1acts = stat_dict['L1acts'] 
+        self.L2acts = stat_dict['L2acts'] 
+        self.L0hist = stat_dict['L0hist']
+        self.L1hist = stat_dict['L1hist']
+        self.L2hist = stat_dict['L2hist'] 
+        self.corrmatrix_ave = stat_dict['corrmatrix_ave']
+        self.errorhist = stat_dict['errorhist']
+        self.objhistory = stat_dict['objhistory']
+        # with open(filename, 'rb') as f:
+        #     self.Q, self.W, self.theta, rates, histories = pickle.load(f)
+        # try:
+        #     (self.L0acts, self.L1acts, self.L2acts, self.L0hist,
+        #      self.L1hist, self.L2hist, self.corrmatrix_ave,
+        #      self.errorhist, self.objhistory) = histories
+        # except:
+        #     # older files don't have as many statistics saved
+        #     try:
+        #         try:
+        #             self.L0acts, self.L1acts, self.L2acts, self.corrmatrix_ave, self.errorhist, self.objhistory = histories
+        #         except ValueError:
+        #             print("Loading old file. Some statistics unavailable.")
+        #             try:
+        #                 self.L0acts, self.L1acts, self.corrmatrix_ave, self.errorhist, self.objhistory = histories
+        #                 assert len(self.L1acts.shape) < 2
+        #             except AssertionError:
+        #                 self.L1acts, self.corrmatrix_ave, self.errorhist, self.objhistory, usage = histories
+        #                 self.L0acts = usage
+        #     except ValueError:
+        #         self.L1acts, self.corrmatrix_ave, self.errorhist, self.objhistory = histories
+        # self.alpha, self.beta, self.gamma = rates
+        # self.paramfile = filename
