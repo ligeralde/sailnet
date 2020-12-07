@@ -116,6 +116,7 @@ class SAILnet(DictLearner):
         self.actshistory = np.array([])
         self.dQhistory = np.array([])
 
+
     def infer(self, X, infplot=False, savestr=None):
         """
         Simulate LIF neurons to get spike counts.
@@ -193,10 +194,12 @@ class SAILnet(DictLearner):
         The learning rates are multiplied by rate_decay after each trial.
         """
         self.actshistory = np.zeros((self.nunits, ntrials//self.store_every))
-        self.dQhistory = np.zeros((self.nunits, ntrials//self.store_every-1))
+        self.dQhistory = np.zeros((self.nunits, ntrials//self.store_every))
+        self.datahistory = np.zeros((self.batch_size, ntrials))
 
         for t in range(ntrials):
-            X = self.stims.rand_stim() #(256, 100) matrix, each column a ravelled patch
+            X, idxs = self.stims.rand_stim() #(256, 100) matrix, each column a ravelled patch
+            self.datahistory[:, t] = idxs
             acts = self.infer(X) #(1536, 100) matrix, each column the activities for every unit 
             errors = np.mean(self.compute_errors(acts, X)) #(256, 100) matrix = X - Q^T * acts
             if t % self.store_every == 0:
@@ -322,6 +325,8 @@ class SAILnet(DictLearner):
     def get_histories(self):
         histories = super().get_histories()
         histories['objhistory'] = self.objhistory
+        histories['actshistory'] = self.actshistory
+        histories['dQhistory'] = self.dQhistory
         return histories
 
     def set_histories(self, histories):
@@ -369,6 +374,8 @@ class SAILnet(DictLearner):
         self.corrmatrix_ave = stat_dict['corrmatrix_ave']
         self.errorhist = stat_dict['errorhist']
         self.objhistory = stat_dict['objhistory']
+        self.actshistory = stat_dict['actshistory']
+        self.dQhistory = stat_dict['dQhistory']
         # with open(filename, 'rb') as f:
         #     self.Q, self.W, self.theta, rates, histories = pickle.load(f)
         # try:

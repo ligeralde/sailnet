@@ -24,19 +24,24 @@ class StimSet(object):
         self.datasize = data.shape[1]
         self.batch_size = batch_size
 
-    def rand_stim(self, batch_size=None):
+    def rand_stim(self, track=False, batch_size=None):
         """Select random inputs. Return an array of batch_size columns,
         each of which is an input represented as a (column) vector. """
         batch_size = batch_size or self.batch_size
         veclength = np.prod(self.datasize)
         X = np.zeros((veclength, batch_size))
+        idxs = np.zeros(batch_size)
         for i in range(batch_size):
             which = np.random.randint(self.nstims)
+            idxs[i] = which
             vec = self.data[which, ...]
             if len(vec.shape) > 1:
                 vec = vec.reshape(self.stimsize)
             X[:, i] = vec
-        return X
+        if track == False:
+            return X
+        else:
+            return X, idxs
 
     @staticmethod
     def _stimarray(stims, stimshape, layout='sqrt'):
