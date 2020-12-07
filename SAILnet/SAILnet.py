@@ -198,7 +198,7 @@ class SAILnet(DictLearner):
         self.datahistory = np.zeros((self.batch_size, ntrials))
 
         for t in range(ntrials):
-            X, idxs = self.stims.rand_stim() #(256, 100) matrix, each column a ravelled patch
+            X, idxs = self.stims.rand_stim(track=True) #(256, 100) matrix, each column a ravelled patch
             self.datahistory[:, t] = idxs
             acts = self.infer(X) #(1536, 100) matrix, each column the activities for every unit 
             errors = np.mean(self.compute_errors(acts, X)) #(256, 100) matrix = X - Q^T * acts

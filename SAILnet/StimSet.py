@@ -24,7 +24,7 @@ class StimSet(object):
         self.datasize = data.shape[1]
         self.batch_size = batch_size
 
-    def rand_stim(self, track=False, batch_size=None):
+    def rand_stim(self, batch_size=None):
         """Select random inputs. Return an array of batch_size columns,
         each of which is an input represented as a (column) vector. """
         batch_size = batch_size or self.batch_size
@@ -129,7 +129,6 @@ class StimSet(object):
         if savestr is not None:
             plt.savefig(savestr, bbox_inches='tight')
 
-
 class ImageSet(StimSet):
     """Container for image data. The 'stimuli' are patches drawn randomly from
     the set of images."""
@@ -141,7 +140,7 @@ class ImageSet(StimSet):
         StimSet.__init__(self, data, stimshape, batch_size)
         self.datasize = np.prod(stimshape)  # size of a patch
 
-    def rand_stim(self, stimshape=None, batch_size=None):
+    def rand_stim(self, track=False, stimshape=None, batch_size=None):
         """
         Select random patches from the image data. Returns data array of
         batch_size columns, each of which is an unrolled image patch of size
@@ -151,8 +150,10 @@ class ImageSet(StimSet):
         length, height = stimshape or self.stimshape
         # extract subimages at random from images array to make data array X
         X = np.zeros((length*height, batch_size))
+        idxs = np.zeros(batch_size)
         for i in range(batch_size):
             which = np.random.randint(self.data.shape[-1])
+            idxs[i] = which
             nrows, ncols = self.data[:, :, which].shape
             row = self.buffer + int(np.ceil((nrows-length-2*self.buffer)*np.random.rand()))
             col = self.buffer + int(np.ceil((nrows-height-2*self.buffer)*np.random.rand()))
@@ -161,11 +162,14 @@ class ImageSet(StimSet):
                                 which]
             animage = animage.reshape(self.stimsize)
             if self.patchwisenorm:
-                # normalize image
+                # normalize image    
                 animage -= animage.mean()
                 animage /= animage.std()
             X[:, i] = animage
-        return X
+        if track == False:
+            return X
+        else:
+            return X, idxs
 
 
 class PCvecSet(StimSet):
