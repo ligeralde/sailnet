@@ -16,7 +16,7 @@ try:
     from scipy.stats import skew
 except ImportError:
     print('Plotting and modulation plot unavailable.')
-import StimSet
+from . import stimset
 
 
 class DictLearner(object):
@@ -54,24 +54,24 @@ class DictLearner(object):
         self.meanacts = np.zeros_like(self.L0acts)
 
     def _load_stims(self, data, datatype, stimshape, pca):
-        if isinstance(data, StimSet.StimSet):
+        if isinstance(data, stimset.StimSet):
             self.stims = data
         elif datatype == "image" and pca is not None:
             stimshape = stimshape or (16, 16)
-            self.stims = StimSet.PCvecSet(data, stimshape, pca,
+            self.stims = stimset.PCvecSet(data, stimshape, pca,
                                           self.batch_size)
         elif datatype == "image":
             stimshape = stimshape or (16, 16)
-            self.stims = StimSet.ImageSet(data, batch_size=self.batch_size,
+            self.stims = stimset.ImageSet(data, batch_size=self.batch_size,
                                           buffer=20, stimshape=stimshape)
         elif datatype == "spectro" and pca is not None:
             if stimshape is None:
                 raise Exception("When using PC representations, \
                     you need to provide the shape of the original stimuli.")
-            self.stims = StimSet.SpectroPCSet(data, stimshape, pca,
+            self.stims = stimset.SpectroPCSet(data, stimshape, pca,
                                               self.batch_size)
         elif datatype == "waveform" and pca is not None:
-            self.stims = StimSet.WaveformPCSet(data, stimshape, pca,
+            self.stims = stimset.WaveformPCSet(data, stimshape, pca,
                                                self.batch_size)
         else:
             raise ValueError("Specified data type not currently supported.")

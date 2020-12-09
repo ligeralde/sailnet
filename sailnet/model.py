@@ -20,10 +20,11 @@ from __future__ import absolute_import, division, print_function
 import numpy as np
 import pickle
 
-from DictLearner import DictLearner
-import plotting
+from . import dictlearner
+from . import plotting
 
-class SAILnet(DictLearner):
+
+class SAILnet(dictlearner.DictLearner):
     """
     Runs SAILnet: Sparse And Independent Local Network
     Currently supports images and spectrograms.
