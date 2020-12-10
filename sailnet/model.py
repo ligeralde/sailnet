@@ -116,6 +116,7 @@ class SAILnet(dictlearner.DictLearner):
         self.objhistory = np.array([])
         self.actshistory = np.array([])
         self.dQhistory = np.array([])
+        self.datahistory = np.array([])
 
 
     def infer(self, X, infplot=False, savestr=None):
@@ -328,6 +329,7 @@ class SAILnet(dictlearner.DictLearner):
         histories['objhistory'] = self.objhistory
         histories['actshistory'] = self.actshistory
         histories['dQhistory'] = self.dQhistory
+        histories['datahistory'] = self.datahistory
         return histories
 
     def set_histories(self, histories):
@@ -377,6 +379,7 @@ class SAILnet(dictlearner.DictLearner):
         self.objhistory = stat_dict['objhistory']
         self.actshistory = stat_dict['actshistory']
         self.dQhistory = stat_dict['dQhistory']
+        self.datahistory= stat_dict['datahistory']
         # with open(filename, 'rb') as f:
         #     self.Q, self.W, self.theta, rates, histories = pickle.load(f)
         # try:

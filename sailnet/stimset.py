@@ -24,7 +24,7 @@ class StimSet(object):
         self.datasize = data.shape[1]
         self.batch_size = batch_size
 
-    def rand_stim(self, batch_size=None):
+    def rand_stim(self, track=False, batch_size=None):
         """Select random inputs. Return an array of batch_size columns,
         each of which is an input represented as a (column) vector. """
         batch_size = batch_size or self.batch_size
