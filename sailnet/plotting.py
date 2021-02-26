@@ -44,11 +44,11 @@ class Plotter(object):
         plt.bar(np.arange(net.theta.size), net.theta)
         plt.title(r"Thresholds $\theta$")
 
-    def visualize(self, cmap='gray'):
+    def visualize(self, cmap='RdBu_r'):
         """Display visualizations of network parameters."""
-        plt.figure()
+        plt.figure(figsize=(8,8))
         self.show_network()
-        plt.figure()
+        plt.figure(figsize=(8,8))
         self.net.show_dict(cmap=cmap)
         plt.show()
 

@@ -217,11 +217,12 @@ class DictLearner(object):
         else:
             Qs = self.Q
         array = stimset.stimarray(Qs[::-1], layout=layout)
-        plt.figure()
+        plt.figure(figsize=(8,8))
         arrayplot = plt.imshow(array, interpolation='nearest', cmap=cmap,
                                aspect='auto', origin='lower')
         plt.axis('off')
         plt.colorbar()
+        plt.show()
         if savestr is not None:
             plt.savefig(savestr, bbox_inches='tight')
         return arrayplot

@@ -116,6 +116,7 @@ class SAILnet(dictlearner.DictLearner):
         self.objhistory = np.array([])
         self.actshistory = np.array([])
         self.dQhistory = np.array([])
+        self.rfWcorrhistory = np.array([])
         self.datahistory = np.array([])
 
 
@@ -197,25 +198,34 @@ class SAILnet(dictlearner.DictLearner):
         """
         self.actshistory = np.zeros((self.nunits, ntrials//self.store_every))
         self.dQhistory = np.zeros((self.nunits, ntrials//self.store_every))
+        # self.Whistory = np.zeros((self.nunits*(self.nunits-1)/2, ntrials//self.store_every))
+        self.rfWcorrhistory = np.zeros(ntrials//self.store_every)
         self.datahistory = np.zeros((self.batch_size, ntrials))
 
         for t in range(ntrials):
             X, idxs = self.stims.rand_stim(track=True) #(256, 100) matrix, each column a ravelled patch
             self.datahistory[:, t] = idxs
-            acts = self.infer(X) #(1536, 100) matrix, each column the activities for every unit 
+            acts = self.infer(X) #(1536, 100) matrix, each column the activities for every unit
             errors = np.mean(self.compute_errors(acts, X)) #(256, 100) matrix = X - Q^T * acts
             if t % self.store_every == 0:
-                corrmatrix = self.store_statistics(acts, errors)
+                corrmatrix = self.store_statistics(acts, errors) #for storing and computing corrmatrix
                 self.objhistory = np.append(self.objhistory,
                     self.compute_objective(acts, X))
                 self.actshistory[:, t//self.store_every - 1] = np.mean(acts, axis=1)
+                mask = self.W[np.triu_indices(1024,k=1)] > 1e-12
+                W = self.W[np.triu_indices(1024,k=1)][mask]
+                W = W - W.mean()
+                rf_overlaps = self.Q.dot(self.Q.T)[np.triu_indices(1024,k=1)][mask]
+                rf_overlaps - rf_overlaps.mean()
+                rfWcorr = np.dot(W, rf_overlaps)/(np.sqrt(np.sum(W**2))*np.sqrt(np.sum(rf_overlaps**2)))
+                self.rfWcorrhistory[:, t//self.store_every - 1] = rfWcorr
                 Q = self.Q
             else:
-                corrmatrix = self.compute_corrmatrix(acts, errors, acts.mean(1))
+                corrmatrix = self.compute_corrmatrix(acts, errors, acts.mean(1)) #computing corrmatrix, no storing
 
             self.learn(X, acts, corrmatrix)
 
-            if t % self.store_every == 0:    
+            if t % self.store_every == 0:
                 self.dQhistory[:, t//self.store_every] = np.mean(self.Q-Q, axis=1)
 
             if t % 50 == 0:
@@ -262,7 +272,7 @@ class SAILnet(dictlearner.DictLearner):
         self.alpha = factor*self.alpha
         self.beta = factor*self.beta
         self.gamma = factor*self.gamma
-        self.objhistory = factor*self.objhistory
+        # self.objhistory = factor*self.objhistory
 
     def sort_dict(self, batch_size=None, allstims=False, plot=True,
                   savestr=None):
@@ -329,6 +339,7 @@ class SAILnet(dictlearner.DictLearner):
         histories['objhistory'] = self.objhistory
         histories['actshistory'] = self.actshistory
         histories['dQhistory'] = self.dQhistory
+        histories['rfWcorrhistory'] = self.rfWcorrhistory
         histories['datahistory'] = self.datahistory
         return histories
 
@@ -369,16 +380,17 @@ class SAILnet(dictlearner.DictLearner):
         self.nunits = param_dict['nunits']
         self.p = param_dict['p']
         self.L0acts = stat_dict['L0acts']
-        self.L1acts = stat_dict['L1acts'] 
-        self.L2acts = stat_dict['L2acts'] 
+        self.L1acts = stat_dict['L1acts']
+        self.L2acts = stat_dict['L2acts']
         self.L0hist = stat_dict['L0hist']
         self.L1hist = stat_dict['L1hist']
-        self.L2hist = stat_dict['L2hist'] 
+        self.L2hist = stat_dict['L2hist']
         self.corrmatrix_ave = stat_dict['corrmatrix_ave']
         self.errorhist = stat_dict['errorhist']
         self.objhistory = stat_dict['objhistory']
         self.actshistory = stat_dict['actshistory']
         self.dQhistory = stat_dict['dQhistory']
+        self.rfWcorrhistory = stat_dict['rfWcorrhistory']
         self.datahistory= stat_dict['datahistory']
         # with open(filename, 'rb') as f:
         #     self.Q, self.W, self.theta, rates, histories = pickle.load(f)
@@ -403,3 +415,4 @@ class SAILnet(dictlearner.DictLearner):
         #         self.L1acts, self.corrmatrix_ave, self.errorhist, self.objhistory = histories
         # self.alpha, self.beta, self.gamma = rates
         # self.paramfile = filename
+
