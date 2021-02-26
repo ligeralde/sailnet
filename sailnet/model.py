@@ -113,11 +113,11 @@ class SAILnet(dictlearner.DictLearner):
         # initialize average activity stats
         self.initialize_stats()
         self.corrmatrix_ave = self.p**2
-        self.objhistory = np.array([])
-        self.actshistory = np.array([])
-        self.dQhistory = np.array([])
-        self.rfWcorrhistory = np.array([])
-        self.datahistory = np.array([])
+        self.objhistory = []
+        self.actshistory = []
+        self.dQhistory = []
+        self.rfWcorrhistory = []
+        self.datahistory = []
 
 
     def infer(self, X, infplot=False, savestr=None):
@@ -196,29 +196,28 @@ class SAILnet(dictlearner.DictLearner):
         after each set of batch_size presentations.
         The learning rates are multiplied by rate_decay after each trial.
         """
-        self.actshistory = np.zeros((self.nunits, ntrials//self.store_every))
-        self.dQhistory = np.zeros((self.nunits, ntrials//self.store_every))
+        # self.actshistory_slice = np.zeros((self.nunits, ntrials//self.store_every))
+        # self.dQhistory_slice = np.zeros((self.nunits, ntrials//self.store_every))
         # self.Whistory = np.zeros((self.nunits*(self.nunits-1)/2, ntrials//self.store_every))
-        self.rfWcorrhistory = np.zeros(ntrials//self.store_every)
-        self.datahistory = np.zeros((self.batch_size, ntrials))
+        # self.rfWcorrhistory_slice = np.zeros(ntrials//self.store_every)
+        # self.datahistory_slice = np.zeros((self.batch_size, ntrials))
 
         for t in range(ntrials):
             X, idxs = self.stims.rand_stim(track=True) #(256, 100) matrix, each column a ravelled patch
-            self.datahistory[:, t] = idxs
+            self.datahistory.append(idxs)
             acts = self.infer(X) #(1536, 100) matrix, each column the activities for every unit
             errors = np.mean(self.compute_errors(acts, X)) #(256, 100) matrix = X - Q^T * acts
             if t % self.store_every == 0:
                 corrmatrix = self.store_statistics(acts, errors) #for storing and computing corrmatrix
-                self.objhistory = np.append(self.objhistory,
-                    self.compute_objective(acts, X))
-                self.actshistory[:, t//self.store_every - 1] = np.mean(acts, axis=1)
+                self.objhistory.append(self.compute_objective(acts, X))
+                self.actshistory.append(np.mean(acts, axis=1))
                 mask = self.W[np.triu_indices(1024,k=1)] > 1e-12
                 W = self.W[np.triu_indices(1024,k=1)][mask]
                 W = W - W.mean()
                 rf_overlaps = self.Q.dot(self.Q.T)[np.triu_indices(1024,k=1)][mask]
                 rf_overlaps - rf_overlaps.mean()
                 rfWcorr = np.dot(W, rf_overlaps)/(np.sqrt(np.sum(W**2))*np.sqrt(np.sum(rf_overlaps**2)))
-                self.rfWcorrhistory[t//self.store_every - 1] = rfWcorr
+                self.rfWcorrhistory.append(rfWcorr)
                 Q = self.Q
             else:
                 corrmatrix = self.compute_corrmatrix(acts, errors, acts.mean(1)) #computing corrmatrix, no storing
@@ -226,7 +225,7 @@ class SAILnet(dictlearner.DictLearner):
             self.learn(X, acts, corrmatrix)
 
             if t % self.store_every == 0:
-                self.dQhistory[:, t//self.store_every] = np.mean(self.Q-Q, axis=1)
+                self.dQhistory.append(np.mean(self.Q-Q, axis=1))
 
             if t % 50 == 0:
                 print("Trial number: " + str(t))
