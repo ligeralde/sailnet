@@ -218,7 +218,7 @@ class SAILnet(dictlearner.DictLearner):
                 rf_overlaps = self.Q.dot(self.Q.T)[np.triu_indices(1024,k=1)][mask]
                 rf_overlaps - rf_overlaps.mean()
                 rfWcorr = np.dot(W, rf_overlaps)/(np.sqrt(np.sum(W**2))*np.sqrt(np.sum(rf_overlaps**2)))
-                self.rfWcorrhistory[:, t//self.store_every - 1] = rfWcorr
+                self.rfWcorrhistory[t//self.store_every - 1] = rfWcorr
                 Q = self.Q
             else:
                 corrmatrix = self.compute_corrmatrix(acts, errors, acts.mean(1)) #computing corrmatrix, no storing
