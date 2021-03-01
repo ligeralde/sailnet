@@ -49,7 +49,10 @@ class SAILnet(dictlearner.DictLearner):
                  moving_avg_rate=0.001,
                  paramfile='SAILnetparams.pickle',
                  pca=None,
-                 store_every=1):
+                 store_every=1,
+                 rfwplots=False,
+                 rfw_store_factor=1
+                 ):
         """
         Create SAILnet object with given parameters.
         Defaults are as used in Zylberberg et al.
@@ -96,6 +99,8 @@ class SAILnet(dictlearner.DictLearner):
         self.ninput = ninput  # N in original MATLAB code
         self.stimshape = stimshape
         self.store_every = store_every
+        self.rfwplots = rfwplots
+        self.rfw_store_factor = rfw_store_factor
 
         self._load_stims(data, datatype, self.stimshape, self.pca)
 
@@ -117,6 +122,8 @@ class SAILnet(dictlearner.DictLearner):
         self.actshistory = []
         self.dQhistory = []
         self.rfWcorrhistory = []
+        self.Whistory = []
+        self.rfoverlaphistory = []
         self.datahistory = []
 
 
@@ -213,12 +220,16 @@ class SAILnet(dictlearner.DictLearner):
                 self.actshistory.append(np.mean(acts, axis=1))
                 mask = self.W[np.triu_indices(1024,k=1)] > 1e-12
                 W = self.W[np.triu_indices(1024,k=1)][mask]
+                rfoverlaps = self.Q.dot(self.Q.T)[np.triu_indices(1024,k=1)][mask]
+                if t % self.rfw_store_factor == 0:
+                    self.Whistory.append(W)
+                    self.rfoverlaphistory.append(rfoverlaps)
                 W = W - W.mean()
-                rf_overlaps = self.Q.dot(self.Q.T)[np.triu_indices(1024,k=1)][mask]
-                rf_overlaps - rf_overlaps.mean()
-                rfWcorr = np.dot(W, rf_overlaps)/(np.sqrt(np.sum(W**2))*np.sqrt(np.sum(rf_overlaps**2)))
+                rfoverlaps - rfoverlaps.mean()
+                rfWcorr = np.dot(W, rfoverlaps)/(np.sqrt(np.sum(W**2))*np.sqrt(np.sum(rfoverlaps**2)))
                 self.rfWcorrhistory.append(rfWcorr)
                 Q = self.Q
+
             else:
                 corrmatrix = self.compute_corrmatrix(acts, errors, acts.mean(1)) #computing corrmatrix, no storing
 
@@ -339,6 +350,8 @@ class SAILnet(dictlearner.DictLearner):
         histories['actshistory'] = self.actshistory
         histories['dQhistory'] = self.dQhistory
         histories['rfWcorrhistory'] = self.rfWcorrhistory
+        histories['Whistory'] = self.Whistory
+        histories['rfoverlaphistory'] = self.rfoverlaphistory
         histories['datahistory'] = self.datahistory
         return histories
 
@@ -390,6 +403,8 @@ class SAILnet(dictlearner.DictLearner):
         self.actshistory = stat_dict['actshistory']
         self.dQhistory = stat_dict['dQhistory']
         self.rfWcorrhistory = stat_dict['rfWcorrhistory']
+        self.Whistory = stat_dict['Whistory']
+        self.rfoverlaphistory = stat_dict['rfoverlaphistory']
         self.datahistory= stat_dict['datahistory']
         # with open(filename, 'rb') as f:
         #     self.Q, self.W, self.theta, rates, histories = pickle.load(f)
