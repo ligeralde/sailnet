@@ -218,16 +218,19 @@ class SAILnet(dictlearner.DictLearner):
                 corrmatrix = self.store_statistics(acts, errors) #for storing and computing corrmatrix
                 self.objhistory.append(self.compute_objective(acts, X))
                 self.actshistory.append(np.mean(acts, axis=1))
-                mask = self.W[np.triu_indices(1024,k=1)] > 1e-12
+                mask = self.W[np.triu_indices(1024,k=1)] > 0
                 W = self.W[np.triu_indices(1024,k=1)][mask]
                 rfoverlaps = self.Q.dot(self.Q.T)[np.triu_indices(1024,k=1)][mask]
                 if t % self.rfw_store_factor == 0:
                     self.Whistory.append(W)
                     self.rfoverlaphistory.append(rfoverlaps)
-                W = W - W.mean()
-                rfoverlaps - rfoverlaps.mean()
-                rfWcorr = np.dot(W, rfoverlaps)/(np.sqrt(np.sum(W**2))*np.sqrt(np.sum(rfoverlaps**2)))
-                self.rfWcorrhistory.append(rfWcorr)
+                    if len(W) == 0:
+                        self.rfWcorrhistory.append(0)
+                    else:
+                        W = W - W.mean()
+                        rfoverlaps - rfoverlaps.mean()
+                        rfWcorr = np.dot(W, rfoverlaps)/(np.sqrt(np.sum(W**2))*np.sqrt(np.sum(rfoverlaps**2)))
+                        self.rfWcorrhistory.append(rfWcorr)
                 Q = self.Q
 
             else:
