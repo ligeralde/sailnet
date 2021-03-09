@@ -1,5 +1,5 @@
-from . import dictlearner
-from dictlearner import DictLearner as BaseLearner
+from . import dictlearner.DictLearner as BaseLearner
+
 import numpy as np
 try:
     import matplotlib.pyplot as plt
