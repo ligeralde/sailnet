@@ -1,4 +1,4 @@
-from . import dictlearner.DictLearner as BaseLearner
+from . import dictlearner
 
 import numpy as np
 try:
@@ -6,7 +6,7 @@ try:
 except ImportError:
     print("Can't import matplotlib.")
 
-class Sparsenet(BaseLearner):
+class Sparsenet(dictlearner.DictLearner):
     """A sparse dictionary learner based on (Olshausen and Field, 1996)."""
 
     def __init__(self, data, nunits, eta=0.01, measure='abs', infrate=1,
