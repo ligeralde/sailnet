@@ -35,7 +35,7 @@ class Sparsenet(dictlearner.DictLearner):
         self.variances = self.var_goal*np.ones(nunits)
         self.var_eta = var_eta
         self.gain_rate = gain_rate
-        BaseLearner.__init__(self, data, eta, nunits, **kwargs)
+        dictlearner.DictLearner.__init__(self, data, eta, nunits, **kwargs)
 
     def dSda(self, acts):
         """Returns the derivative of the activity-measuring function."""
@@ -65,7 +65,7 @@ class Sparsenet(dictlearner.DictLearner):
         return acts, None, None
 
     def learn(self, data, coeffs, normalize=True):
-        mse = BaseLearner.learn(self, data, coeffs, normalize)
+        mse = dictlearner.DictLearner.learn(self, data, coeffs, normalize)
         variances = np.diag(coeffs.dot(coeffs.T))/self.batch_size
         self.variances = (1-self.var_eta)*self.variances + self.var_eta*variances
         newgains = self.var_goal/self.variances
@@ -76,7 +76,7 @@ class Sparsenet(dictlearner.DictLearner):
     def sort(self, usages, sorter, plot=False, savestr=None):
         self.gains = self.gains[sorter]
         self.variances = self.variances[sorter]
-        BaseLearner.sort(self, usages, sorter, plot, savestr)
+        dictlearner.DictLearner.sort(self, usages, sorter, plot, savestr)
 
     def set_params(self, params):
         (self.learnrate, self.infrate, self.niter, self.lamb,
