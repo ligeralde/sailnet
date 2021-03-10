@@ -64,13 +64,14 @@ class Sparsenet(dictlearner.DictLearner):
             plt.plot(costY1)
         return acts, None, None
 
-    def learn(self, data, coeffs, normalize=True):
+    def learn(self, data, coeffs, normalize=False):
         mse = dictlearner.DictLearner.learn(self, data, coeffs, normalize)
         variances = np.diag(coeffs.dot(coeffs.T))/self.batch_size
         self.variances = (1-self.var_eta)*self.variances + self.var_eta*variances
-        newgains = self.var_goal/self.variances
+        newgains = self.variances/self.var_goal
         self.gains = self.gains*newgains**self.gain_rate
-        self.Q = self.gains[:,np.newaxis]*self.Q
+        normQ = np.linalg.norm(self.Q)
+        self.Q = self.gains[:,np.newaxis]*self.Q/normQ
         return mse/np.mean(data**2)
 
     def sort(self, usages, sorter, plot=False, savestr=None):
