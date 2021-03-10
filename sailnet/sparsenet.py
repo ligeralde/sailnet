@@ -71,7 +71,7 @@ class Sparsenet(dictlearner.DictLearner):
         newgains = self.var_goal/self.variances
         self.gains = self.gains*newgains**self.gain_rate
         self.Q = self.gains[:,np.newaxis]*self.Q
-        return mse
+        return mse/np.mean(data**2)
 
     def sort(self, usages, sorter, plot=False, savestr=None):
         self.gains = self.gains[sorter]
