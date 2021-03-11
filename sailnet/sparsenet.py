@@ -66,7 +66,7 @@ class Sparsenet(dictlearner.DictLearner):
 
     def learn(self, data, coeffs, normalize=False):
         mse = dictlearner.DictLearner.learn(self, data, coeffs, normalize)
-        variances = np.diag(coeffs.dot(coeffs.T))/self.batch_size
+        variances = np.var(coeffs, axis=1)
         self.variances = (1-self.var_eta)*self.variances + self.var_eta*variances
         newgains = self.variances/self.var_goal
         self.gains = self.gains*newgains**self.gain_rate
