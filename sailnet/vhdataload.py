@@ -39,7 +39,7 @@ class VHDataset:
           print('Reshaping and saving raw training images...')
           np.savez('raw_train_{}'.format(self.file_ext), self.move_axis_to_batch_minor(train_data,0))
           train_data = None
-          test_data = np.empty((test_length,dims[0],dims[1]), dtype='float32')
+          test_data = np.empty((test_length,self.dims[0],self.dims[1]), dtype='float32')
         if (i-train_length)%10 == 0 and i-train_length>-1:
           print('Processing testing image #{} out of {}...'.format(i-train_length, test_length))
         test_data[i-train_length, :, :] = img.reshape(self.dims)
