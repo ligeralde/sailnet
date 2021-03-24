@@ -30,7 +30,7 @@ class VHDataset:
     print('Beginning loop...')
     for i, path in enumerate(self.filepaths):
       img = self.extract_image(path, self.dims, self.logscale, self.with_mean, self.with_std)
-      if i < train_length:
+      if i < train_length-1:
         if i%10 == 0 and i>0:
           print('Processing training image #{} out of {}...'.format(i, train_length))
         train_data[i, :, :] = img.reshape(self.dims)
@@ -40,7 +40,7 @@ class VHDataset:
           np.savez('raw_train_{}'.format(self.file_ext), self.move_axis_to_batch_minor(train_data,0))
           train_data = None
           test_data = np.empty((test_length,dims[0],dims[1]), dtype='float32')
-        if (i-train_length)%10 == 0 and i-train_length>0:
+        if (i-train_length)%10 == 0 and i-train_length>-1:
           print('Processing testing image #{} out of {}...'.format(i-train_length, test_length))
         test_data[i-train_length, :, :] = img.reshape(self.dims)
     if test_data != []:
