@@ -61,10 +61,10 @@ class VHDataset:
 
   def center_crop(self, img, dims):
     if dims[0] != 1024:
-      row_crop = (1024-dims[0])/2
+      row_crop = (1024-dims[0])//2
       img = img.reshape((1024,1536))[row_crop:-row_crop,col_crop:-col_crop]
     if dims[1] != 1536:
-      col_crop = (1536-dims[1])/2
+      col_crop = (1536-dims[1])//2
       img = img.reshape((dims[0],1536))[:,col_crop:-col_crop]
     return img.ravel()
 
