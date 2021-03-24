@@ -35,7 +35,7 @@ class VHDataset:
           print('Processing training image #{} out of {}...'.format(i, train_length))
         train_data[i, :, :] = img.reshape(self.dims)
       else:
-        if i == train_length:
+        if i == train_length-1:
           print('Reshaping and saving raw training images...')
           np.savez('raw_train_{}'.format(self.file_ext), self.move_axis_to_batch_minor(train_data,0))
           train_data = None
@@ -43,8 +43,9 @@ class VHDataset:
         if (i-train_length)%10 == 0 and i-train_length>0:
           print('Processing testing image #{} out of {}...'.format(i-train_length, test_length))
         test_data[i-train_length, :, :] = img.reshape(self.dims)
-    print('Reshaping and saving raw testing images...')
-    np.savez('raw_test_{}'.format(self.file_ext), self.move_axis_to_batch_minor(test_data,0))
+    if test_data != []:
+      print('Reshaping and saving raw testing images...')
+      np.savez('raw_test_{}'.format(self.file_ext), self.move_axis_to_batch_minor(test_data,0))
 
   def extract_image(self, filepath, dims, logscale, with_mean, with_std):
     return self.mean_center(self.center_crop(self.bytes_to_arrays(filepath,logscale),dims),with_mean,with_std)
