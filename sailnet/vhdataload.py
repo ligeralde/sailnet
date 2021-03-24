@@ -7,7 +7,7 @@ from os.path import expanduser
 from sklearn.preprocessing import scale
 
 class VHDataset:
-  def __init__(self, img_dir, file_ext, filenames=None, dims=(1024,1532), logscale=True, with_mean=True, with_std=False, train_prop=.8)
+  def __init__(self, img_dir, file_ext, filenames=None, dims=(1024,1532), logscale=True, with_mean=True, with_std=False, train_prop=.8):
     assert dims[0] % 2 == 0 and dims[1] % 2 == 0
     self.folderpath = os.path.expanduser(img_dir)
     self.file_ext = file_ext
