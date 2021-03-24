@@ -37,14 +37,14 @@ class VHDataset:
       else:
         if i == train_length:
           print('Reshaping and saving raw training images...')
-          np.savez('raw_train_{}'.format(file_ext), self.move_axis_to_batch_minor(train_data,0))
+          np.savez('raw_train_{}'.format(self.file_ext), self.move_axis_to_batch_minor(train_data,0))
           train_data = None
           test_data = np.empty((test_length,dims[0],dims[1]), dtype='float32')
         if (i-train_length)%10 == 0 and i-train_length>0:
           print('Processing testing image #{} out of {}...'.format(i-train_length, test_length))
         test_data[i-train_length, :, :] = img.reshape(self.dims)
     print('Reshaping and saving raw testing images...')
-    np.savez('raw_test_{}'.format(file_ext), self.move_axis_to_batch_minor(test_data,0))
+    np.savez('raw_test_{}'.format(self.file_ext), self.move_axis_to_batch_minor(test_data,0))
 
   def extract_image(self, filepath, dims, logscale, with_mean, with_std):
     return self.mean_center(self.center_crop(self.bytes_to_arrays(filepath,logscale),dims),with_mean,with_std)
@@ -55,7 +55,7 @@ class VHDataset:
     arr = array.array('H', s)
     arr.byteswap()
     if logscale == True:
-      return np.log(np.array(arr,dtype='uint16'))
+      return np.log(1+np.array(arr,dtype='uint16'))
     else:
       return np.array(arr,dtype='uint16')
 
