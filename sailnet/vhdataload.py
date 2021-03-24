@@ -26,7 +26,7 @@ class VHDataset:
     train_length = int(self.train_prop*len(self.filepaths))
     test_length = len(self.filepaths)-int(self.train_prop*len(self.filepaths))
     print('Preallocating array...')
-    train_data = np.empty((train_length, dims[0], dims[1]),dtype='float32')
+    train_data = np.empty((train_length, self.dims[0], self.dims[1]),dtype='float32')
     print('Beginning loop...')
     for i, path in enumerate(self.filepaths):
       img = self.extract_image(path, self.dims, self.logscale, self.with_mean, self.with_std)
