@@ -77,11 +77,11 @@ class VHDataset:
 
 
   # folderpath = os.path.expanduser("vh_raw")
-filenames = ['imk00264.iml', 'imk00315.iml', 'imk00665.iml', 'imk00695.iml', 'imk00735.iml', 'imk00765.iml', 'imk00777.iml',
-'imk00944.iml', 'imk00968.iml', 'imk01026.iml', 'imk01042.iml', 'imk01098.iml', 'imk01251.iml', 'imk01306.iml',
-'imk01342.iml', 'imk01726.iml', 'imk01781.iml', 'imk02226.iml', 'imk02260.iml', 'imk02262.iml', 'imk02982.iml',
-'imk02996.iml', 'imk03332.iml', 'imk03362.iml', 'imk03401.iml', 'imk03451.iml', 'imk03590.iml', 'imk03686.iml',
-'imk03751.iml', 'imk03836.iml', 'imk03848.iml', 'imk04099.iml', 'imk04103.iml', 'imk04172.iml', 'imk04207.iml']
+# filenames = ['imk00264.iml', 'imk00315.iml', 'imk00665.iml', 'imk00695.iml', 'imk00735.iml', 'imk00765.iml', 'imk00777.iml',
+# 'imk00944.iml', 'imk00968.iml', 'imk01026.iml', 'imk01042.iml', 'imk01098.iml', 'imk01251.iml', 'imk01306.iml',
+# 'imk01342.iml', 'imk01726.iml', 'imk01781.iml', 'imk02226.iml', 'imk02260.iml', 'imk02262.iml', 'imk02982.iml',
+# 'imk02996.iml', 'imk03332.iml', 'imk03362.iml', 'imk03401.iml', 'imk03451.iml', 'imk03590.iml', 'imk03686.iml',
+# 'imk03751.iml', 'imk03836.iml', 'imk03848.iml', 'imk04099.iml', 'imk04103.iml', 'imk04172.iml', 'imk04207.iml']
 
 # filepaths  = [os.path.join(folderpath, name) for name in filenames] #os.listdir(folderpath)]
 # filepaths = [x for x in filepaths if not '.DS_Store' in x]
@@ -119,4 +119,4 @@ filenames = ['imk00264.iml', 'imk00315.iml', 'imk00665.iml', 'imk00695.iml', 'im
 # np.savez('raw_test_no_test', move_axis_to_batch_minor(test,0))
 
 
-                                                                                                                                                                                                        "redwood1" 11:17 24-Mar-21
+
