@@ -4,7 +4,7 @@ import os
 import math
 import random
 from os.path import expanduser
-from sklearn.preprocessing import scale
+from sklearn.preprocessing import StandardScaler as scale
 
 class VHDataset:
   def __init__(self, img_dir, file_ext, filenames=None, dims=(1024,1532), logscale=True, with_mean=True, with_std=False, train_prop=.8):
@@ -69,7 +69,7 @@ class VHDataset:
     return img.ravel()
 
   def mean_center(self, img, with_mean, with_std):
-    return scale(img, with_mean=with_mean, with_std=with_std)
+    return scale(with_mean=with_mean, with_std=with_std).fit(img)
 
   def move_axis_to_batch_minor(self, batch_major_data, batch_axis):
     #moves batch axis to the last axis
