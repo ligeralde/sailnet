@@ -22,7 +22,7 @@ class VHDataset:
     self.with_std = with_std
     self.filepaths = [os.path.join(self.folderpath, name) for name in self.filenames if not '.DS_Store' in name]
 
-  def extract_dataset(self, dims):
+  def extract_dataset(self):
     train_length = int(self.train_prop*len(self.filepaths))
     test_length = len(self.filepaths)-int(self.train_prop*len(self.filepaths))
     print('Preallocating array...')
@@ -47,7 +47,7 @@ class VHDataset:
     np.savez('raw_test_{}'.format(file_ext), self.move_axis_to_batch_minor(test_data,0))
 
   def extract_image(self, filepath, dims, logscale, with_mean, with_std):
-    return self.mean_center(self.center_crop(self.bytes_to_arrays(filepath),dims,logscale),with_mean,with_std)
+    return self.mean_center(self.center_crop(self.bytes_to_arrays(filepath,logscale),dims),with_mean,with_std)
 
   def bytes_to_arrays(self, filepath, logscale):
     with open(filepath, 'rb') as handle:
