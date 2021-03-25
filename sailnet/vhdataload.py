@@ -22,7 +22,8 @@ class VHDataset:
     self.logscale = logscale
     self.with_mean = with_mean
     self.with_std = with_std
-    self.filepaths = random.shuffle([os.path.join(self.folderpath, name) for name in self.filenames if not '.DS_Store' in name])
+    self.filepaths = [os.path.join(self.folderpath, name) for name in self.filenames if not '.DS_Store' in name]
+    random.shuffle(self.filepaths)
 
   def extract_dataset(self):
     train_length = int(self.train_prop*len(self.filepaths))
