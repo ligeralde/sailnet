@@ -6,6 +6,8 @@ import random
 from os.path import expanduser
 # from sklearn.preprocessing import StandardScaler as scale
 
+#### TO ADD: finish full data then split
+              # add randomizer for filepath order
 class VHDataset:
   def __init__(self, img_dir, file_ext, filenames=None, dims=(1024,1532), logscale=True, with_mean=True, with_std=False, train_prop=.8):
     assert dims[0] % 2 == 0 and dims[1] % 2 == 0
@@ -20,32 +22,43 @@ class VHDataset:
     self.logscale = logscale
     self.with_mean = with_mean
     self.with_std = with_std
-    self.filepaths = [os.path.join(self.folderpath, name) for name in self.filenames if not '.DS_Store' in name]
+    self.filepaths = random.shuffle([os.path.join(self.folderpath, name) for name in self.filenames if not '.DS_Store' in name])
 
   def extract_dataset(self):
     train_length = int(self.train_prop*len(self.filepaths))
     test_length = len(self.filepaths)-int(self.train_prop*len(self.filepaths))
     print('Preallocating array...')
-    train_data = np.empty((train_length, self.dims[0], self.dims[1]),dtype='float32')
+    full_data = np.empty((len(self.filepaths) self.dims[0], self.dims[1]),dtype='float32')
     print('Beginning loop...')
     for i, path in enumerate(self.filepaths):
+      if (i+1)%10 == 0:
+        if i < train_length-1:
+          print('Processing image #{} out of {}...'.format(i+1, train_length))
+        else:
+          print('Processing testing image #{} out of {}...'.format(i-train_length+1, test_length))
       img = self.extract_image(path, self.dims, self.logscale, self.with_mean, self.with_std)
-      if i < train_length-1:
-        if i%10 == 0 and i>0:
-          print('Processing training image #{} out of {}...'.format(i, train_length))
-        train_data[i, :, :] = img.reshape(self.dims)
-      else:
-        if i == train_length-1:
-          print('Reshaping and saving raw training images...')
-          np.savez('raw_train_{}'.format(self.file_ext), self.move_axis_to_batch_minor(train_data,0))
-          train_data = None
-          test_data = np.empty((test_length,self.dims[0],self.dims[1]), dtype='float32')
-        if (i-train_length)%10 == 0 and i-train_length>-1:
-          print('Processing testing image #{} out of {}...'.format(i-train_length, test_length))
-        test_data[i-train_length, :, :] = img.reshape(self.dims)
-    if test_data != []:
-      print('Reshaping and saving raw testing images...')
-      np.savez('raw_test_{}'.format(self.file_ext), self.move_axis_to_batch_minor(test_data,0))
+      full_data[i, :, :] = img.reshape(self.dims)
+    print('Reshaping and saving raw training images...')
+    np.savez('raw_train_{}'.format(self.file_ext), self.move_axis_to_batch_minor(full_data[:train_length,:,:],0))
+    if test_length != 0:
+      np.savez('raw_test{}'.format(self.file_ext), self.move_axis_to_batch_minor(full_data[train_length:,:,:],0))
+
+
+
+
+
+    #   else:
+    #     if i == train_length-1:
+
+    #       np.savez('raw_train_{}'.format(self.file_ext), self.move_axis_to_batch_minor(train_data,0))
+    #       train_data = None
+    #       test_data = np.empty((test_length,self.dims[0],self.dims[1]), dtype='float32')
+    #     if (i-train_length)%10 == 0 and i-train_length>-1:
+    #       print('Processing testing image #{} out of {}...'.format(i-train_length, test_length))
+    #     test_data[i-train_length+1, :, :] = img.reshape(self.dims)
+    # if test_data != []:
+    #   print('Reshaping and saving raw testing images...')
+    #   np.savez('raw_test_{}'.format(self.file_ext), self.move_axis_to_batch_minor(test_data,0))
 
   def extract_image(self, filepath, dims, logscale, with_mean, with_std):
     return self.mean_center(self.center_crop(self.bytes_to_arrays(filepath,logscale),dims),with_mean,with_std)
