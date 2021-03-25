@@ -28,7 +28,7 @@ class VHDataset:
     train_length = int(self.train_prop*len(self.filepaths))
     test_length = len(self.filepaths)-int(self.train_prop*len(self.filepaths))
     print('Preallocating array...')
-    full_data = np.empty((len(self.filepaths) self.dims[0], self.dims[1]),dtype='float32')
+    full_data = np.empty((len(self.filepaths), self.dims[0], self.dims[1]),dtype='float32')
     print('Beginning loop...')
     for i, path in enumerate(self.filepaths):
       if (i+1)%10 == 0:
