@@ -73,7 +73,7 @@ class VHDataset:
     else:
       std = img.std()
     if with_mean == False:
-      mean = 1
+      mean = 0
     else:
       mean = img.mean()
     # return scale(with_mean=with_mean, with_std=with_std).fit(img)
