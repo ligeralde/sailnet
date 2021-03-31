@@ -1,5 +1,5 @@
 import numpy as np
-import matplotlib.pylot as plt
+import matplotlib.pyplot as plt
 import os
 import random
 import statistics
