@@ -181,3 +181,17 @@ def rf_overlap_grid_plot(Whistory, rfoverlaphistory):
         fig.set_figheight(10)
         fig.set_figwidth(dims[1]/dims[0]*10)
     return(fig, axs)
+
+def display_raw_image(raw_images, center=False, idx=None):
+    if idx == None:
+        idx = np.random.randint(0,np.shape(raw_images)[-1])
+    data = raw_images[:,:,idx]
+    if center == True:
+        vmax = np.max(np.abs([data.min(),data.max()]))
+        vmin = -vmax
+    else:
+        vmax = None
+        vmin = None
+    plt.imshow(data, interpolation='nearest',cmap='gray', vmin=vmin, vmax=vmax)
+    plt.show()
+    print('Idx: {} Mean: {} Stdev: {} Min: {} Max: {}'.format(idx, np.mean(data), np.std(data), data.min(), data.max()))
