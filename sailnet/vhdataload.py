@@ -72,8 +72,8 @@ class VHDataset:
       #list of indices for tracking images that get an extra patch due to remainder. uniform random sample
     else:
       extra_patch_idxs = None
-    train_patches = np.zeros((self.train_length, self.patch_dims[0]*self.patch_dims[1]))
-    test_patches = np.zeros((self.test_length, self.patch_dims[0]*self.patch_dims[1]))
+    train_patches = np.zeros((math.floor(self.train_prop*num_patches), self.patch_dims[0]*self.patch_dims[1]))
+    test_patches = np.zeros((num_patches-math.floor(self.train_prop*num_patches), self.patch_dims[0]*self.patch_dims[1]))
     begin = 0
     end = 0
     for idx in range(self.train_length):
