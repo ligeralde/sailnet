@@ -82,7 +82,7 @@ class VHDataset:
         extra_patch_idxs.pop(0)
       else:
         max_patches = patches_per_im
-      im_patches = image.extract_patches_2d(raw_train_images[:,:,idx], self.patch_dims, max_patches=max_patches)
+      im_patches = image.extract_patches_2d(self.raw_train_images[:,:,idx], self.patch_dims, max_patches=max_patches)
       end += max_patches
       train_patches[begin:end,:] = [np.ravel(im_patches[i,:,:]) for i in range(im_patches.shape[0])]
       begin+=max_patches
@@ -94,7 +94,7 @@ class VHDataset:
         extra_patch_idxs.pop(0)
       else:
         max_patches = patches_per_im
-      im_patches = image.extract_patches_2d(raw_test_images[:,:,idx], self.patch_dims, max_patches=max_patches)
+      im_patches = image.extract_patches_2d(self.raw_test_images[:,:,idx], self.patch_dims, max_patches=max_patches)
       end += max_patches
       test_patches[begin:end,:] = [np.ravel(im_patches[i,:,:]) for i in range(im_patches.shape[0])]
       begin+=max_patches
