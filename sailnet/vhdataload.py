@@ -68,7 +68,7 @@ class VHDataset:
   def extract_patches(self, num_patches=375000):
     patches_per_im = num_patches // (self.train_length+self.test_length)
     if num_patches % (self.train_length+self.test_length) != 0:
-      extra_patch_idxs = sorted(random.sample(range(self.train_length+self.test_length), k=num_patches/(self.train_length+self.test_length)))
+      extra_patch_idxs = sorted(random.sample(range(self.train_length+self.test_length), k=num_patches%(self.train_length+self.test_length)))
       #list of indices for tracking images that get an extra patch due to remainder. uniform random sample
     else:
       extra_patch_idxs = None
