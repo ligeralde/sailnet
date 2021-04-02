@@ -94,8 +94,7 @@ def display_patches(n_patches, imageset, figsize=(8,8), patch_dims=(16,16), pcob
     if sample == False:
         imagelist = zip(axs, imageset)
     else:
-        sample_idxs = random.sample(range(len(imageset)), n_patches)
-        imagelist = zip(axs, imageset[sample_idxs])
+        imagelist = zip(axs, random.sample(imageset, n_patches))
 
     for ax, image in imagelist:
         if center == True:
