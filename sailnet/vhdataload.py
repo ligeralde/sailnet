@@ -39,6 +39,8 @@ class VHDataset:
     self.raw_test_images = np.array([])
     self.train_length = int(train_prop*len(self.filepaths))
     self.test_length = len(self.filepaths)-int(train_prop*len(self.filepaths))
+    self.train_patches = np.array([])
+    self.test_patches = np.array([])
     random.shuffle(self.filepaths)
 
   def extract_dataset(self):
@@ -72,8 +74,8 @@ class VHDataset:
       #list of indices for tracking images that get an extra patch due to remainder. uniform random sample
     else:
       extra_patch_idxs = None
-    train_patches = np.zeros((math.floor(self.train_prop*num_patches), self.patch_dims[0]*self.patch_dims[1]))
-    test_patches = np.zeros((num_patches-math.floor(self.train_prop*num_patches), self.patch_dims[0]*self.patch_dims[1]))
+    self.train_patches = np.zeros((math.floor(self.train_prop*num_patches), self.patch_dims[0]*self.patch_dims[1]))
+    self.test_patches = np.zeros((num_patches-math.floor(self.train_prop*num_patches), self.patch_dims[0]*self.patch_dims[1]))
     begin = 0
     end = 0
     for idx in range(self.train_length):
@@ -84,8 +86,9 @@ class VHDataset:
         max_patches = patches_per_im
       im_patches = image.extract_patches_2d(self.raw_train_images[:,:,idx], self.patch_dims, max_patches=max_patches)
       end += max_patches
-      train_patches[begin:end,:] = [np.ravel(im_patches[i,:,:]) for i in range(im_patches.shape[0])]
+      self.train_patches[begin:end,:] = [np.ravel(im_patches[i,:,:]) for i in range(im_patches.shape[0])]
       begin+=max_patches
+
     begin = 0
     end = 0
     for idx in range(self.test_length):
@@ -96,7 +99,7 @@ class VHDataset:
         max_patches = patches_per_im
       im_patches = image.extract_patches_2d(self.raw_test_images[:,:,idx], self.patch_dims, max_patches=max_patches)
       end += max_patches
-      test_patches[begin:end,:] = [np.ravel(im_patches[i,:,:]) for i in range(im_patches.shape[0])]
+      self.test_patches[begin:end,:] = [np.ravel(im_patches[i,:,:]) for i in range(im_patches.shape[0])]
       begin+=max_patches
     return(train_patches, test_patches)
 

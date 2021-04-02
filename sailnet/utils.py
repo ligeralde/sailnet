@@ -75,7 +75,7 @@ def factors(n):
     return set(reduce(list.__add__,
                 ([i, n//i] for i in range(1, int(sqrt(n))+1, step) if n % i == 0)))
 
-def display_patches(n_patches, imageset, pcobject=None, center=False, cmap='gray', sample=False):
+def display_patches(n_patches, imageset, patch_dims=(16,16), pcobject=None, center=False, cmap='gray', sample=False):
     fs = factors(n_patches)
     if len(fs)%2 == 0:
         dims = [statistics.median_low(fs), statistics.median_high(fs)]
@@ -105,7 +105,7 @@ def display_patches(n_patches, imageset, pcobject=None, center=False, cmap='gray
             vmax = None
             vmin = None
         if pcobject:
-                image = np.reshape(pcobject.inverse_transform(image, whiten=False), (16,16))
+                image = np.reshape(pcobject.inverse_transform(image, whiten=False), patch_dims)
         else:
             image = np.reshape(image, (16,16))
         ax.imshow(image, cmap=cmap, interpolation='nearest', vmin=vmin, vmax=vmax)
