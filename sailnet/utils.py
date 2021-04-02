@@ -94,7 +94,7 @@ def display_patches(n_patches, imageset, figsize=(8,8), patch_dims=(16,16), pcob
     if sample == False:
         imagelist = zip(axs, imageset)
     else:
-        sample_idxs = np.random.choice(len(imageset), n_patches, replace=False)
+        sample_idxs = random.sample(range(len(imageset)), n_patches)
         imagelist = zip(axs, imageset[sample_idxs])
 
     for ax, image in imagelist:
