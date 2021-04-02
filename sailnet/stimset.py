@@ -83,7 +83,7 @@ class StimSet(object):
                 m = int(np.sqrt(nstim))
                 n = m
         elif layout == 'sqrt':
-            # if length != height, partly account for this so stimuli aren't so distorted. 
+            # if length != height, partly account for this so stimuli aren't so distorted.
             # could remove the extra square root to fully accommodate
             n = int(np.sqrt(nstim*np.sqrt(height/length)))
             m = int(np.ceil(nstim/n))
@@ -150,10 +150,14 @@ class ImageSet(StimSet):
         length, height = stimshape or self.stimshape
         # extract subimages at random from images array to make data array X
         X = np.zeros((length*height, batch_size))
-        idxs = np.zeros(batch_size)
+        if track == True:
+            idxs = np.zeros(batch_size)
+        else:
+            idxs == None
         for i in range(batch_size):
             which = np.random.randint(self.data.shape[-1])
-            idxs[i] = which
+            if track == True:
+                idxs[i] = which
             nrows, ncols = self.data[:, :, which].shape
             row = self.buffer + int(np.ceil((nrows-length-2*self.buffer)*np.random.rand()))
             col = self.buffer + int(np.ceil((nrows-height-2*self.buffer)*np.random.rand()))
@@ -162,15 +166,15 @@ class ImageSet(StimSet):
                                 which]
             animage = animage.reshape(self.stimsize)
             if self.patchwisenorm:
-                # normalize image    
+                # normalize image
                 animage -= animage.mean()
                 animage /= animage.std()
             X[:, i] = animage
-        if track == False:
-            return X
-        else:
+        if track == True:
             return X, idxs
 
+        else:
+            return X
 
 class PCvecSet(StimSet):
     """Principal component vector representations of arbitrary data."""

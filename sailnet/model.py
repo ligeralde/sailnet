@@ -196,7 +196,7 @@ class SAILnet(dictlearner.DictLearner):
         dtheta = self.gamma*(np.sum(acts, 1)/self.batch_size - self.p)
         self.theta = self.theta + dtheta
 
-    def run(self, ntrials=25000, rate_decay=1):
+    def run(self, ntrials=25000, datatracking=False, rate_decay=1):
         """
         Run SAILnet for ntrials: for each trial, create a random set of image
         patches, present each to the network, and update the network weights
@@ -210,8 +210,12 @@ class SAILnet(dictlearner.DictLearner):
         # self.datahistory_slice = np.zeros((self.batch_size, ntrials))
 
         for t in range(ntrials):
-            X, idxs = self.stims.rand_stim(track=True) #(256, 100) matrix, each column a ravelled patch
-            self.datahistory.append(idxs)
+            if datatracking == True:
+                X, idxs = self.stims.rand_stim(track=datatracking) #(256, 100) matrix, each column a ravelled patch
+                self.datahistory.append(idxs)
+            else:
+                X = self.stims.rand_stim(track=datatracking)
+
             acts = self.infer(X) #(1536, 100) matrix, each column the activities for every unit
             errors = np.mean(self.compute_errors(acts, X)) #(256, 100) matrix = X - Q^T * acts
             if t % self.store_every == 0:
