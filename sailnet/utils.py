@@ -75,21 +75,21 @@ def factors(n):
     return set(reduce(list.__add__,
                 ([i, n//i] for i in range(1, int(sqrt(n))+1, step) if n % i == 0)))
 
-def display_patches(n_patches, imageset, patch_dims=(16,16), pcobject=None, center=False, cmap='gray', sample=False):
+def display_patches(n_patches, imageset, figsize=(8,8), patch_dims=(16,16), pcobject=None, center=False, cmap='gray', sample=False):
+    '''
+    Function that takes in batch major data (must be a list)
+    '''
     fs = factors(n_patches)
     if len(fs)%2 == 0:
         dims = [statistics.median_low(fs), statistics.median_high(fs)]
     else:
         dims = [statistics.median(fs), statistics.median(fs)]
-  # f, axarr = plt.subplots(dims[0], dims[1])
-    # if idxs == None:
-    #     idxs = random.sample(list(range(0,len(imageset))), dims[0]*dims[1])
-    # else:
-    #     pass
-
 
     fig = plt.figure(figsize=(8,8))
     axs = [fig.add_subplot(dims[0],dims[1],i+1) for i in range(n_patches)]
+
+    if type(imageset) != list:
+        imageset = [imageset[i,:] for i in range(imageset.shape[0])]
 
     if sample == False:
         imagelist = zip(axs, imageset)
@@ -105,9 +105,9 @@ def display_patches(n_patches, imageset, patch_dims=(16,16), pcobject=None, cent
             vmax = None
             vmin = None
         if pcobject:
-                image = np.reshape(pcobject.inverse_transform(image, whiten=False), patch_dims)
+                image = np.reshape(pcobject.inverse_transform(image), patch_dims)
         else:
-            image = np.reshape(image, (16,16))
+            image = np.reshape(image, patch_dims)
         ax.imshow(image, cmap=cmap, interpolation='nearest', vmin=vmin, vmax=vmax)
         ax.get_xaxis().set_visible(False)
         ax.get_yaxis().set_visible(False)
