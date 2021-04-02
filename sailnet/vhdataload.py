@@ -101,7 +101,7 @@ class VHDataset:
       end += max_patches
       self.test_patches[begin:end,:] = [np.ravel(im_patches[i,:,:]) for i in range(im_patches.shape[0])]
       begin+=max_patches
-    return(train_patches, test_patches)
+    return(self.train_patches, self.test_patches)
 
   def bytes_to_arrays(self, filepath, logscale):
     with open(filepath, 'rb') as handle:
