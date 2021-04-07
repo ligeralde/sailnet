@@ -153,7 +153,7 @@ class ImageSet(StimSet):
         if track == True:
             idxs = np.zeros(batch_size)
         else:
-            idxs == None
+            idxs = None
         for i in range(batch_size):
             which = np.random.randint(self.data.shape[-1])
             if track == True:
