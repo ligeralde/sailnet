@@ -122,6 +122,8 @@ class SAILnet(dictlearner.DictLearner):
         self.actshistory = []
         self.dQhistory = []
         self.Qoverlaphistory = []
+        self.dQtotalhistory = []
+        self.Qtotaloverlaphistory = []
         self.rfWcorrhistory = []
         self.Whistory = []
         self.rfoverlaphistory = []
@@ -209,7 +211,8 @@ class SAILnet(dictlearner.DictLearner):
         # self.Whistory = np.zeros((self.nunits*(self.nunits-1)/2, ntrials//self.store_every))
         # self.rfWcorrhistory_slice = np.zeros(ntrials//self.store_every)
         # self.datahistory_slice = np.zeros((self.batch_size, ntrials))
-
+        Q0 = self.Q
+        Q0norm = np.linalg.norm(Q0, axis=1)
         for t in range(ntrials):
             if datatracking == True:
                 X, idxs = self.stims.rand_stim(track=datatracking) #(256, 100) matrix, each column a ravelled patch
@@ -248,6 +251,9 @@ class SAILnet(dictlearner.DictLearner):
                 oldQnorm = np.linalg.norm(Q, axis=1)
                 Qnorm = np.linalg.norm(self.Q, axis=1)
                 self.Qoverlaphistory.append(np.einsum('ij,ij->i', self.Q, Q)/oldQnorm/Qnorm)
+
+                self.dQtotalhistory.append(np.linalg.norm(self.Q-Q0,axis=1))
+                self.Qtotaloverlaphistory.append(np.einsum('ij,ij->i', self.Q, Q0)/Q0norm/Qnorm)
 
             if t % 50 == 0:
                 print("Trial number: " + str(t))
