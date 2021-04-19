@@ -101,8 +101,6 @@ class SAILnet(dictlearner.DictLearner):
         self.store_every = store_every
         self.rfwplots = rfwplots
         self.rfw_store_factor = rfw_store_factor
-        self.Q0 = self.Q
-        self.Q0norm = np.linalg.norm(self.Q0, axis=1)
 
         self._load_stims(data, datatype, self.stimshape, self.pca)
 
@@ -116,6 +114,8 @@ class SAILnet(dictlearner.DictLearner):
         self.Q = self.rand_dict()
         self.W = np.zeros((self.nunits, self.nunits))
         self.theta = theta0*np.ones(self.nunits)
+        self.Q0 = self.Q
+        self.Q0norm = np.linalg.norm(self.Q0, axis=1)
 
         # initialize average activity stats
         self.initialize_stats()
