@@ -89,8 +89,8 @@ def display_patches(n_patches, imageset, figsize=(8,8), patch_dims=(16,16), pcob
     axs = [fig.add_subplot(dims[0],dims[1],i+1) for i in range(n_patches)]
 
     if labels == True:
-        cols = ['Column {}'.format(col) for col in range(dims[1])]
-        rows = ['Row {}'.format(row) for row in range(dims[0])]
+        cols = ['{}'.format(col) for col in range(dims[1])]
+        rows = ['{}'.format(row) for row in range(dims[0])]
         for ax, col in zip(np.array(axs).reshape(dims)[0], cols):
             ax.set_title(col)
         for ax, row in zip(np.array(axs).reshape(dims)[:,0], rows):
@@ -117,7 +117,7 @@ def display_patches(n_patches, imageset, figsize=(8,8), patch_dims=(16,16), pcob
             image = np.reshape(image, patch_dims)
         ax.imshow(image, cmap=cmap, interpolation='nearest', vmin=vmin, vmax=vmax)
         ax.get_xaxis().set_visible(False)
-        ax.get_yaxis().set_visible(False)
+        ax.get_yaxis().set_ticks([])
 
     fig.tight_layout()
     fig.subplots_adjust(wspace=0, hspace=0)
