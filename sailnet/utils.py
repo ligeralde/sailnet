@@ -89,12 +89,12 @@ def display_patches(n_patches, imageset, figsize=(8,8), patch_dims=(16,16), pcob
     axs = [fig.add_subplot(dims[0],dims[1],i+1) for i in range(n_patches)]
 
     if labels == True:
-        cols = ['{}'.format(col) for col in range(dims[1])]
-        rows = ['{}'.format(row) for row in range(dims[0])]
+        cols = ['{}'.format(col+1) for col in range(dims[1])]
+        rows = ['{}'.format(row+1) for row in range(dims[0])]
         for ax, col in zip(np.array(axs).reshape(dims)[0], cols):
-            ax.set_title(col+1)
+            ax.set_title(col)
         for ax, row in zip(np.array(axs).reshape(dims)[:,0], rows):
-            ax.set_ylabel(row+1, rotation=0, size='large', labelpad=10)
+            ax.set_ylabel(row, rotation=0, size='large', labelpad=10)
 
     if type(imageset) != list:
         imageset = [imageset[i,:] for i in range(imageset.shape[0])]
