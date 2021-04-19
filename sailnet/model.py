@@ -121,6 +121,7 @@ class SAILnet(dictlearner.DictLearner):
         self.objhistory = []
         self.actshistory = []
         self.dQhistory = []
+        self.Qoverlaphistory = []
         self.rfWcorrhistory = []
         self.Whistory = []
         self.rfoverlaphistory = []
@@ -243,7 +244,10 @@ class SAILnet(dictlearner.DictLearner):
             self.learn(X, acts, corrmatrix)
 
             if t % self.store_every == 0:
-                self.dQhistory.append(np.mean(self.Q-Q, axis=1))
+                self.dQhistory.append(np.linalg.norm(self.Q-Q,axis=1))
+                oldQnorm = np.linalg.norm(Q, axis=1)
+                Qnorm = np.linalg.norm(self.Q, axis=1)
+                self.Qoverlaphistory.append(np.einsum('ij,ij->i', self.Q, Q)/oldQnorm/Qnorm)
 
             if t % 50 == 0:
                 print("Trial number: " + str(t))
@@ -356,6 +360,7 @@ class SAILnet(dictlearner.DictLearner):
         histories['objhistory'] = self.objhistory
         histories['actshistory'] = self.actshistory
         histories['dQhistory'] = self.dQhistory
+        histories['Qoverlaphistory'] = self.Qoverlaphistory
         histories['rfWcorrhistory'] = self.rfWcorrhistory
         histories['Whistory'] = self.Whistory
         histories['rfoverlaphistory'] = self.rfoverlaphistory
@@ -409,6 +414,7 @@ class SAILnet(dictlearner.DictLearner):
         self.objhistory = stat_dict['objhistory']
         self.actshistory = stat_dict['actshistory']
         self.dQhistory = stat_dict['dQhistory']
+        self.Qoverlaphistory = stat_dict['Qoverlaphistory']
         self.rfWcorrhistory = stat_dict['rfWcorrhistory']
         self.Whistory = stat_dict['Whistory']
         self.rfoverlaphistory = stat_dict['rfoverlaphistory']

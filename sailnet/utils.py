@@ -75,7 +75,7 @@ def factors(n):
     return set(reduce(list.__add__,
                 ([i, n//i] for i in range(1, int(sqrt(n))+1, step) if n % i == 0)))
 
-def display_patches(n_patches, imageset, figsize=(8,8), patch_dims=(16,16), pcobject=None, center=False, labels=True, cmap='gray', sample=False):
+def display_patches(n_patches, imageset, filestr=None, figsize=(8,8), patch_dims=(16,16), pcobject=None, center=False, labels=True, title=None, cmap='gray', sample=False):
     '''
     Function that takes in batch major data (must be a list)
     '''
@@ -95,6 +95,8 @@ def display_patches(n_patches, imageset, figsize=(8,8), patch_dims=(16,16), pcob
             ax.set_title(col)
         for ax, row in zip(np.array(axs).reshape(dims)[:,0], rows):
             ax.set_ylabel(row, rotation=0, size='large', labelpad=10)
+    if title == True:
+        fig.suptitle(title, fontsize=18, y=1.00)
 
     if type(imageset) != list:
         imageset = [imageset[i,:] for i in range(imageset.shape[0])]
@@ -123,6 +125,8 @@ def display_patches(n_patches, imageset, figsize=(8,8), patch_dims=(16,16), pcob
     fig.subplots_adjust(wspace=0, hspace=0)
     fig.set_figheight(dims[0])
     fig.set_figwidth(dims[1])
+    if filestr == True:
+        plt.savefig(filestr, dpi='figure')
     return(fig, axs)
 
 def get_rf_overlap_per_weight(RF, W):
