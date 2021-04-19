@@ -75,7 +75,7 @@ def factors(n):
     return set(reduce(list.__add__,
                 ([i, n//i] for i in range(1, int(sqrt(n))+1, step) if n % i == 0)))
 
-def display_patches(n_patches, imageset, figsize=(8,8), patch_dims=(16,16), pcobject=None, center=False, cmap='gray', sample=False):
+def display_patches(n_patches, imageset, figsize=(8,8), patch_dims=(16,16), pcobject=None, center=False, labels=True, cmap='gray', sample=False):
     '''
     Function that takes in batch major data (must be a list)
     '''
@@ -87,6 +87,14 @@ def display_patches(n_patches, imageset, figsize=(8,8), patch_dims=(16,16), pcob
 
     fig = plt.figure(figsize=(8,8))
     axs = [fig.add_subplot(dims[0],dims[1],i+1) for i in range(n_patches)]
+
+    if labels == True:
+        cols = ['Column {}'.format(col) for col in range(dims[1])]
+        rows = ['Row {}'.format(row) for row in range(dims[0])]
+        for ax, col in zip(axs[0], cols):
+            ax.set_title(col)
+        for ax, row in zip(axes[:,0], rows):
+            ax.set_ylabel(row, rotation=0, size='large')
 
     if type(imageset) != list:
         imageset = [imageset[i,:] for i in range(imageset.shape[0])]
