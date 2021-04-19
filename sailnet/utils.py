@@ -92,9 +92,9 @@ def display_patches(n_patches, imageset, figsize=(8,8), patch_dims=(16,16), pcob
         cols = ['{}'.format(col) for col in range(dims[1])]
         rows = ['{}'.format(row) for row in range(dims[0])]
         for ax, col in zip(np.array(axs).reshape(dims)[0], cols):
-            ax.set_title(col)
+            ax.set_title(col+1)
         for ax, row in zip(np.array(axs).reshape(dims)[:,0], rows):
-            ax.set_ylabel(row, rotation=0, size='large')
+            ax.set_ylabel(row+1, rotation=0, size='large', labelpad=10)
 
     if type(imageset) != list:
         imageset = [imageset[i,:] for i in range(imageset.shape[0])]
