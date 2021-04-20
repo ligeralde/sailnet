@@ -147,7 +147,7 @@ def display_patches(n_patches,
     if filestr is not None:
         figure.savefig(filestr, dpi='figure')
     if display == False:
-        figure.close()
+        plt.close()
     return(fig, axs)
 
 def get_rf_overlap_per_weight(RF, W):
