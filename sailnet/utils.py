@@ -116,8 +116,8 @@ def display_patches(n_patches,
         imageset = [imageset[i,:] for i in range(imageset.shape[0])]
 
     if acts is not None:
-        sorted_idxs = np.argsort(np.linalg.norm(acts, ord=1, axis=1))[::-1]
-        imageset = [imageset[idx] for idx in sorted_idxs]
+        sorted_idxs = np.argsort(np.linalg.norm(acts[:n_patches,:], ord=1, axis=1))[::-1]
+        imageset = [imageset[:n_patches][idx] for idx in sorted_idxs]
 
     if sample == False:
         imagelist = zip(axs, imageset)
