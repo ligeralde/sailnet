@@ -245,12 +245,11 @@ class SAILnet(dictlearner.DictLearner):
                             rfoverlaps - rfoverlaps.mean()
                             rfWcorr = np.dot(W, rfoverlaps)/(np.sqrt(np.sum(W**2))*np.sqrt(np.sum(rfoverlaps**2)))
                             self.rfWcorrhistory.append(rfWcorr)
-                #save current Q value for dQ tracking
-                Q = self.Q
+
                 #track 'displacement' of each RF from initialization
                 self.dQtotalhistory.append(np.linalg.norm(self.Q-self.Q0,axis=1))
                 #track overlap of each RF with its initialization
-                self.Qtotaloverlaphistory.append(np.einsum('ij,ij->i', self.Q, self.Q0)/self.Q0norm/Qnorm)
+                self.Qtotaloverlaphistory.append(np.einsum('ij,ij->i', self.Q, self.Q0)/self.Q0norm/np.linalg.norm(self.Q, axis=1))
                 #track mean smoothness of each RF
                 grads = [np.gradient(self.Q[i,:].reshape(self.stimshape)) for i in range(self.nunits)]
                 smoothness = []
@@ -261,16 +260,18 @@ class SAILnet(dictlearner.DictLearner):
                 L1usage = np.linalg.norm(acts, ord=1, axis=1)[::-1]
                 self.L1usagehistory.append(L1usage)
 
-
             else:
                 corrmatrix = self.compute_corrmatrix(acts, errors, acts.mean(1)) #computing corrmatrix, no storing
+
+            #save current Q value for dQ tracking
+            oldQ = self.Q
 
             self.learn(X, acts, corrmatrix)
 
             if t % self.store_every == 0:
                 self.dQhistory.append(np.linalg.norm(self.Q-Q,axis=1))
                 oldQnorm = np.linalg.norm(Q, axis=1)
-                Qnorm = np.linalg.norm(self.Q, axis=1)
+                newQnorm = np.linalg.norm(self.Q, axis=1)
                 self.Qoverlaphistory.append(np.einsum('ij,ij->i', self.Q, Q)/oldQnorm/Qnorm)
 
 
