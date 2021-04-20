@@ -106,7 +106,7 @@ def display_patches(n_patches,
             ax.set_title(col)
         for ax, row in zip(np.array(axs).reshape(dims)[:,0], rows):
             ax.set_ylabel(row, rotation=0, size='large', labelpad=10)
-    if title == True:
+    if title is not None:
         fig.suptitle(title, fontsize=18, y=1.00)
 
     if type(imageset) != list:
