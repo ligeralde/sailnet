@@ -269,10 +269,10 @@ class SAILnet(dictlearner.DictLearner):
             self.learn(X, acts, corrmatrix)
 
             if t % self.store_every == 0:
-                self.dQhistory.append(np.linalg.norm(self.Q-Q,axis=1))
-                oldQnorm = np.linalg.norm(Q, axis=1)
+                self.dQhistory.append(np.linalg.norm(self.Q-oldQ,axis=1))
+                oldQnorm = np.linalg.norm(oldQ, axis=1)
                 newQnorm = np.linalg.norm(self.Q, axis=1)
-                self.Qoverlaphistory.append(np.einsum('ij,ij->i', self.Q, Q)/oldQnorm/Qnorm)
+                self.Qoverlaphistory.append(np.einsum('ij,ij->i', self.Q, Q)/oldQnorm/newQnorm)
 
 
 
