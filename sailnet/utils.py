@@ -112,7 +112,7 @@ def display_patches(n_patches,
     if type(imageset) != list:
         imageset = [imageset[i,:] for i in range(imageset.shape[0])]
 
-    if acts == True:
+    if acts is not None:
         sorted_idxs = np.argsort(np.linalg.norm(acts, ord=1, axis=1))[::-1]
         imageset = [imageset[idx] for idx in sorted_idxs]
 
