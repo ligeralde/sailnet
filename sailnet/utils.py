@@ -141,7 +141,7 @@ def display_patches(n_patches,
     fig.set_figheight(dims[0])
     fig.set_figwidth(dims[1])
     figure = plt.gcf()
-    if filestr == True:
+    if filestr is not None:
         figure.savefig(filestr, dpi='figure')
     return(fig, axs)
 
