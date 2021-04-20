@@ -78,6 +78,7 @@ def factors(n):
 def display_patches(n_patches,
                     imageset,
                     filestr=None,
+                    display=False,
                     figsize=(8,8),
                     patch_dims=(16,16),
                     pcobject=None,
@@ -106,8 +107,10 @@ def display_patches(n_patches,
             ax.set_title(col)
         for ax, row in zip(np.array(axs).reshape(dims)[:,0], rows):
             ax.set_ylabel(row, rotation=0, size='large', labelpad=10)
+
     if title is not None:
         fig.suptitle(title, fontsize=18, y=1.00)
+        fig.suptitle(title,fontweight ="bold",fontsize=20)
 
     if type(imageset) != list:
         imageset = [imageset[i,:] for i in range(imageset.shape[0])]
@@ -136,13 +139,15 @@ def display_patches(n_patches,
         ax.get_xaxis().set_visible(False)
         ax.get_yaxis().set_ticks([])
 
-    fig.tight_layout()
     fig.subplots_adjust(wspace=0, hspace=0)
     fig.set_figheight(dims[0])
     fig.set_figwidth(dims[1])
+    fig.tight_layout(rect=[0, 0, 1, 0.98])
     figure = plt.gcf()
     if filestr is not None:
         figure.savefig(filestr, dpi='figure')
+    if display == False:
+        figure.close()
     return(fig, axs)
 
 def get_rf_overlap_per_weight(RF, W):
