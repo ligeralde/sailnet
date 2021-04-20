@@ -140,8 +140,9 @@ def display_patches(n_patches,
     fig.subplots_adjust(wspace=0, hspace=0)
     fig.set_figheight(dims[0])
     fig.set_figwidth(dims[1])
+    figure = plt.gcf()
     if filestr == True:
-        plt.savefig(filestr, dpi='figure')
+        figure.savefig(filestr, dpi='figure')
     return(fig, axs)
 
 def get_rf_overlap_per_weight(RF, W):
