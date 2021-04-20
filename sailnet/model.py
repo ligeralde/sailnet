@@ -126,6 +126,7 @@ class SAILnet(dictlearner.DictLearner):
         self.Qoverlaphistory = []
         self.dQtotalhistory = []
         self.Qtotaloverlaphistory = []
+        self.Qsmoothnesshistory = []
         self.rfWcorrhistory = []
         self.Whistory = []
         self.rfoverlaphistory = []
@@ -256,6 +257,12 @@ class SAILnet(dictlearner.DictLearner):
                 self.dQtotalhistory.append(np.linalg.norm(self.Q-self.Q0,axis=1))
                 self.Qtotaloverlaphistory.append(np.einsum('ij,ij->i', self.Q, self.Q0)/self.Q0norm/Qnorm)
 
+                grads = [np.gradient(self.Q[:,i].reshape(self.stimshape)) for i in range(self.nunits)]
+                smoothness = []
+                for grad_pair in grads:
+                    smoothness.append(np.sqrt(grad_pair[0]**2+grad_pair[1]**2).mean())
+                self.Qsmoothnesshistory.append(np.array(smoothness))
+
             if t % 50 == 0:
                 print("Trial number: " + str(t))
                 if t % 5000 == 0:
@@ -368,6 +375,9 @@ class SAILnet(dictlearner.DictLearner):
         histories['actshistory'] = self.actshistory
         histories['dQhistory'] = self.dQhistory
         histories['Qoverlaphistory'] = self.Qoverlaphistory
+        histories['dQtotalhistory'] = self.dQtotalhistory
+        histories['Qtotaloverlaphistory'] = self.Qtotaloverlaphistory
+        histories['Qsmoothnesshistory'] = self.Qsmoothnesshistory
         histories['rfWcorrhistory'] = self.rfWcorrhistory
         histories['Whistory'] = self.Whistory
         histories['rfoverlaphistory'] = self.rfoverlaphistory
@@ -422,6 +432,9 @@ class SAILnet(dictlearner.DictLearner):
         self.actshistory = stat_dict['actshistory']
         self.dQhistory = stat_dict['dQhistory']
         self.Qoverlaphistory = stat_dict['Qoverlaphistory']
+        self.dQtotalhistory = stat_dict['dQtotalhistory']
+        self.Qtotaloverlaphistory = stat_dict['Qtotaloverlaphistory']
+        self.Qsmoothnesshistory = stat_dict['Qsmoothnesshistory']
         self.rfWcorrhistory = stat_dict['rfWcorrhistory']
         self.Whistory = stat_dict['Whistory']
         self.rfoverlaphistory = stat_dict['rfoverlaphistory']
