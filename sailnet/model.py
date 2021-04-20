@@ -344,9 +344,9 @@ class SAILnet(dictlearner.DictLearner):
         self.W = self.W.T[sorter].T
         self.theta = self.theta[sorter]
 
-    def test_inference(self):
+    def test_inference(self, infplot=True):
         X = self.stims.rand_stim()
-        s = self.infer(X, infplot=True)
+        s = self.infer(X, infplot=infplot)
         print("Final SNR: " + str(self.snr(X, s)))
         return s
 
