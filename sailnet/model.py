@@ -257,7 +257,7 @@ class SAILnet(dictlearner.DictLearner):
                 self.dQtotalhistory.append(np.linalg.norm(self.Q-self.Q0,axis=1))
                 self.Qtotaloverlaphistory.append(np.einsum('ij,ij->i', self.Q, self.Q0)/self.Q0norm/Qnorm)
 
-                grads = [np.gradient(self.Q[:,i].reshape(self.stimshape)) for i in range(self.nunits)]
+                grads = [np.gradient(self.Q[i,:].reshape(self.stimshape)) for i in range(self.nunits)]
                 smoothness = []
                 for grad_pair in grads:
                     smoothness.append(np.sqrt(grad_pair[0]**2+grad_pair[1]**2).mean())
