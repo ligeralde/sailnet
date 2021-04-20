@@ -75,7 +75,18 @@ def factors(n):
     return set(reduce(list.__add__,
                 ([i, n//i] for i in range(1, int(sqrt(n))+1, step) if n % i == 0)))
 
-def display_patches(n_patches, imageset, filestr=None, figsize=(8,8), patch_dims=(16,16), pcobject=None, center=False, labels=True, title=None, cmap='gray', sample=False):
+def display_patches(n_patches,
+                    imageset,
+                    filestr=None,
+                    figsize=(8,8),
+                    patch_dims=(16,16),
+                    pcobject=None,
+                    center=False,
+                    labels=True,
+                    title=None,
+                    cmap='gray',
+                    acts=None,
+                    sample=False):
     '''
     Function that takes in batch major data (must be a list)
     '''
@@ -100,6 +111,10 @@ def display_patches(n_patches, imageset, filestr=None, figsize=(8,8), patch_dims
 
     if type(imageset) != list:
         imageset = [imageset[i,:] for i in range(imageset.shape[0])]
+
+    if acts == True:
+        sorted_idxs = np.argsort(np.linalg.norm(acts, ord=1, axis=1))[::-1]
+        imageset = [imageset[idx] for idx in sorted_idxs]
 
     if sample == False:
         imagelist = zip(axs, imageset)
