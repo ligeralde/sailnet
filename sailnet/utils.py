@@ -104,13 +104,15 @@ def display_patches(n_patches,
         cols = ['{}'.format(col+1) for col in range(dims[1])]
         rows = ['{}'.format(row+1) for row in range(dims[0])]
         for ax, col in zip(np.array(axs).reshape(dims)[0], cols):
-            ax.set_title(col)
+            ax.set_title(col, fontweight="bold", size=30, pad=15)
         for ax, row in zip(np.array(axs).reshape(dims)[:,0], rows):
-            ax.set_ylabel(row, rotation=0, size='large', labelpad=10)
+            # ax.set_ylabel(row, rotation=0, size='large', labelpad=10)
+            ax.set_ylabel(row, fontweight="bold", size=30, rotation=0, verticalalignment='center', labelpad=25)
 
     if title is not None:
-        fig.suptitle(title, fontsize=18, y=1.00)
-        fig.suptitle(title,fontweight ="bold",fontsize=20)
+        # fig.suptitle(title, fontsize=18, y=1.00)
+        # fig.suptitle(title,fontweight ="bold",fontsize=20)
+        fig.suptitle('in',fontweight ="bold",fontsize=50)
 
     if type(imageset) != list:
         imageset = [imageset[i,:] for i in range(imageset.shape[0])]

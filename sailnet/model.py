@@ -257,7 +257,7 @@ class SAILnet(dictlearner.DictLearner):
                     smoothness.append(np.sqrt(grad_pair[0]**2+grad_pair[1]**2).mean())
                 self.Qsmoothnesshistory.append(np.array(smoothness))
                 #track L1 usage
-                L1usage = np.linalg.norm(acts, ord=1, axis=1)[::-1]
+                L1usage = np.linalg.norm(acts, ord=1, axis=1)
                 self.L1usagehistory.append(L1usage)
 
             else:
