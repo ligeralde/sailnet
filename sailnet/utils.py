@@ -112,7 +112,7 @@ def display_patches(n_patches,
     if title is not None:
         # fig.suptitle(title, fontsize=18, y=1.00)
         # fig.suptitle(title,fontweight ="bold",fontsize=20)
-        fig.suptitle('in',fontweight ="bold",fontsize=50)
+        fig.suptitle(title,fontweight ="bold",fontsize=50)
 
     if type(imageset) != list:
         imageset = [imageset[i,:] for i in range(imageset.shape[0])]
