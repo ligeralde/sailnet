@@ -11,7 +11,7 @@ class Sparsenet(dictlearner.DictLearner):
     """A sparse dictionary learner based on (Olshausen and Field, 1996)."""
 
     def __init__(self, data, nunits, eta=1, measure='abs', infrate=1,
-                 niter=200, lamb=1/.01, var_goal=0.1, sigma=.3, gain_rate=0.02,
+                 niter=200, lamb=1/.01, var_goal=0.1, sigma=.316, gain_rate=0.02,
                  var_eta=0.1, **kwargs):
 
         #niter: number of inference time steps
@@ -54,9 +54,9 @@ class Sparsenet(dictlearner.DictLearner):
         if self.measure == 'log':
             return lambda acts : np.sum(np.log(1+(acts/self.sigma)**2)) + error(acts)
         elif self.measure == 'abs':
-            return lambda acts : np.abs(acts/self.sigma) + error(acts)
+            return lambda acts : np.sum(np.abs(acts/self.sigma)) + error(acts)
         elif self.measure == 'bell':
-            return lambda acts : -np.exp(-(acts/self.sigma)**2) + error(acts)
+            return lambda acts : np.sum(-np.exp(-(acts/self.sigma)**2)) + error(acts)
 
     def gradient(self, X):
         QX = self.Q.dot(X)
@@ -81,7 +81,7 @@ class Sparsenet(dictlearner.DictLearner):
         # if infplot:
             # plt.plot(costY1)
         # return acts, None, None
-        return np.array(acts_final)
+        return np.array(acts_final).T
 
     def learn(self, data, coeffs, normalize=False):
         mse = dictlearner.DictLearner.learn(self, data, coeffs, normalize)
