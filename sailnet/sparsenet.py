@@ -49,7 +49,7 @@ class Sparsenet(dictlearner.DictLearner):
             return 2*acts*np.exp(-acts**2)
 
     def objective(self, X):
-        X_hat = lambda acts : self.Q.T.dot(acts)
+        X_hat = lambda acts : self.Q.dot(acts)
         error = lambda acts : 0.5*np.linalg.norm(X-X_hat(acts))**2
         if self.measure == 'log':
             return lambda acts : np.sum(np.log(1+(acts/self.sigma)**2)) + error(acts)
