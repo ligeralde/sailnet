@@ -64,8 +64,8 @@ class Sparsenet(dictlearner.DictLearner):
         return lambda acts : QX - gramian.dot(acts) - self.lamb/self.sigma*self.dSda(acts/self.sigma)
 
     def infer(self, X, infplot=False):
-        X_list = [X[:,i] for i in X.shape(1)]
-        acts = np.zeros((self.nunits,X.shape[1]))
+        X_list = [X[:,i] for i in np.shape(X)[0]]
+        # acts = np.zeros((self.nunits,X.shape[1]))
         # if infplot:
             # costY1 = np.zeros(self.niter)
         objective = objective(X)
