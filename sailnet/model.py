@@ -114,9 +114,9 @@ class SAILnet(dictlearner.DictLearner):
         self.Q = self.rand_dict()
         self.W = np.zeros((self.nunits, self.nunits))
         self.theta = theta0*np.ones(self.nunits)
-        self.Q0 = self.Q
-        self.Q0norm = np.linalg.norm(self.Q0, axis=1)
-
+        if len(self.errorhist) == 0:
+            self.Q0 = self.Q
+            self.Q0norm = np.linalg.norm(self.Q0, axis=1)
         # initialize average activity stats
         self.initialize_stats()
         self.corrmatrix_ave = self.p**2
@@ -215,7 +215,6 @@ class SAILnet(dictlearner.DictLearner):
         # self.Whistory = np.zeros((self.nunits*(self.nunits-1)/2, ntrials//self.store_every))
         # self.rfWcorrhistory_slice = np.zeros(ntrials//self.store_every)
         # self.datahistory_slice = np.zeros((self.batch_size, ntrials))
-
         for t in range(ntrials):
             if datatracking == True:
                 X, idxs = self.stims.rand_stim(track=datatracking) #(256, 100) matrix, each column a ravelled patch
