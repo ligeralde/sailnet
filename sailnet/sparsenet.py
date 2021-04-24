@@ -49,7 +49,7 @@ class Sparsenet(dictlearner.DictLearner):
             return 2*acts*np.exp(-acts**2)
 
     def objective(self, X):
-        X_hat = lambda acts : self.Q.dot(acts)
+        X_hat = lambda acts : self.Q.T.dot(acts)
         error = lambda acts : 0.5*np.linalg.norm(X-X_hat(acts))**2
         if self.measure == 'log':
             return lambda acts : np.sum(np.log(1+(acts/self.sigma)**2)) + error(acts)
@@ -68,9 +68,9 @@ class Sparsenet(dictlearner.DictLearner):
         # acts = np.zeros((self.nunits,X.shape[1]))
         # if infplot:
             # costY1 = np.zeros(self.niter)
-        objective = self.objective(X)
-        gradient = self.gradient(X)
-        acts_final = [optimize.fmin_cg(objective(x), np.zeros(self.nunits), fprime=gradient(x)) for x in X_list]
+        # objective = self.objective(X)
+        # gradient = self.gradient(X)
+        acts_final = [optimize.fmin_cg(self.objective(x), np.zeros(self.nunits), fprime=self.gradient(x)) for x in X_list]
         # phi_sq = self.Q.dot(self.Q.T)
         # QX = self.Q.dot(X)
         # for k in range(self.niter):
