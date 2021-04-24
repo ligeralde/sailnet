@@ -68,8 +68,8 @@ class Sparsenet(dictlearner.DictLearner):
         # acts = np.zeros((self.nunits,X.shape[1]))
         # if infplot:
             # costY1 = np.zeros(self.niter)
-        objective = objective(X)
-        gradient = gradient(X)
+        objective = self.objective(X)
+        gradient = self.gradient(X)
         acts_final = [optimize.fmin_cg(objective(x), np.zeros(self.nunits), fprime=gradient(x)) for x in X_list]
         # phi_sq = self.Q.dot(self.Q.T)
         # QX = self.Q.dot(X)
