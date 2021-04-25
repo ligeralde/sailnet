@@ -11,7 +11,7 @@ class Sparsenet(dictlearner.DictLearner):
     """A sparse dictionary learner based on (Olshausen and Field, 1996)."""
 
     def __init__(self, data, nunits, eta=1, measure='abs', infrate=1,
-                 niter=200, lamb=1/.01, var_goal=0.1, sigma=.316, gain_rate=0.02,
+                 niter=200, lamb=.01, var_goal=0.1, sigma=.316, gain_rate=0.02,
                  var_eta=0.1, **kwargs):
 
         #niter: number of inference time steps
@@ -70,7 +70,9 @@ class Sparsenet(dictlearner.DictLearner):
             # costY1 = np.zeros(self.niter)
         # objective = self.objective(X)
         # gradient = self.gradient(X)
-        acts_final = [optimize.fmin_cg(self.objective(x), np.zeros(self.nunits), fprime=self.gradient(x)) for x in X_list]
+        dictnorms = np.sum(self.Q**2,axis=1)
+        acts0 = lambda x : self.Q.dot(x)/dictnorms
+        acts_final = [optimize.fmin_cg(self.objective(x), acts0(x), fprime=self.gradient(x)) for x in X_list]
         # phi_sq = self.Q.dot(self.Q.T)
         # QX = self.Q.dot(X)
         # for k in range(self.niter):
