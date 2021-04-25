@@ -1,3 +1,10 @@
+"""
+Created on Thu Aug 20 15:48:46 2015
+@author: Eric Dodds
+(Inference method adapted from code by Jesse Livezey)
+Dictionary learner that uses LCA for inference and gradient descent for learning.
+(Intended for static inputs)
+"""
 import numpy as np
 import matplotlib.pyplot as plt
 from . import dictlearner
@@ -52,7 +59,7 @@ class LCALearner(dictlearner.DictLearner):
         self.gpu = gpu
         self.meanacts = np.zeros(nunits)
         super().__init__(data, learnrate, nunits, paramfile = paramfile, theta=theta, moving_avg_rate=moving_avg_rate,
-                            stimshape=stimshape, datatype=datatype, batch_size=batch_size, pca=pca, **kwargs)
+                            stimshape=stimshape, datatype=datatype, batch_size=batch_size, pca=pca)
 
     def show_oriented_dict(self, batch_size=None, *args, **kwargs):
         """Display tiled dictionary as in DictLearn.show_dict(), but with elements inverted
