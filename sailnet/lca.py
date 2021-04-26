@@ -194,7 +194,7 @@ class LCALearner(dictlearner.DictLearner):
                 'infrate': self.infrate,
                 'niter': self.niter,
                 'adapt': self.adapt,
-                'nunits': self.nunits
+                'nunits': self.nunits,
                 'max_iter': self.max_iter,
                 'tolerance': self.tolerance,
                 }
