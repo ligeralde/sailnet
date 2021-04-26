@@ -38,9 +38,9 @@ class DictLearner(object):
         self.store_every = store_every
 
         self._load_stims(data, datatype, stimshape, pca)
-
         self.Q = self.rand_dict()
         self.Qhistory.append(self.Q)
+
         # try:
         #     self.Q0
         # except AttributeError:
@@ -398,7 +398,7 @@ class DictLearner(object):
                 'L0acts': self.L0acts,
                 'L1acts': self.L1acts,
                 'L2acts': self.L2acts,
-                'Qhistory': self.Qhistory
+                'Qhistory': self.Qhistory,
                 'dQhistory': self.dQhistory,
                 'Qoverlaphistory': self.Qoverlaphistory,
                 'dQtotalhistory': self.dQtotalhistory,
