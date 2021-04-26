@@ -174,14 +174,13 @@ class DictLearner(object):
                 #track rfs
                 self.Qhistory.append(self.Q)
                 #get previous recorded RF
-                if trial >0:
-                    oldQ = self.Qhistory[-2]
+                oldQ = self.Qhistory[-2]
                 #track 'displacement' of RF from 50 iterations ago
-                    self.dQhistory.append(np.linalg.norm(self.Q-oldQ,axis=1))
+                self.dQhistory.append(np.linalg.norm(self.Q-oldQ,axis=1))
                 #track overlap of RF from 50 iterations ago
-                    oldQnorm = np.linalg.norm(oldQ, axis=1)
-                    newQnorm = np.linalg.norm(self.Q, axis=1)
-                    self.Qoverlaphistory.append(np.einsum('ij,ij->i', self.Q, oldQ)/oldQnorm/newQnorm)
+                oldQnorm = np.linalg.norm(oldQ, axis=1)
+                newQnorm = np.linalg.norm(self.Q, axis=1)
+                self.Qoverlaphistory.append(np.einsum('ij,ij->i', self.Q, oldQ)/oldQnorm/newQnorm)
                 #track 'displacement' of each RF from initialization
                 self.dQtotalhistory.append(np.linalg.norm(self.Q-Q0,axis=1))
                 #track overlap of each RF with its initialization
