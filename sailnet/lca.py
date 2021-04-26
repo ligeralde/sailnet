@@ -75,7 +75,7 @@ class LCALearner(dictlearner.DictLearner):
         self.stimshape = stimshape
 
         super().__init__(data, learnrate, nunits, paramfile = paramfile, theta=theta, moving_avg_rate=moving_avg_rate,
-                            stimshape=stimshape, datatype=datatype, batch_size=batch_size, pca=pca)
+                            stimshape=stimshape, datatype=datatype, batch_size=batch_size, pca=pca, store_every=store_every)
 
 
     def show_oriented_dict(self, batch_size=None, *args, **kwargs):
