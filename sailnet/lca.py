@@ -194,6 +194,7 @@ class LCALearner(dictlearner.DictLearner):
                 'adapt': self.adapt,
                 'max_iter': self.max_iter,
                 'tolerance': self.tolerance,
+                }
                 # 'Q0': self.Q0,
                 # 'Q0norm': self.Q0norm}
     def set_histories(self, histories):
