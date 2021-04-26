@@ -184,7 +184,7 @@ class LCALearner(dictlearner.DictLearner):
         #self.infrate = self.infrate*factor # this is bad, but NC seems to have done it
 
     def set_params(self, params):
-        (self.learnrate, self.theta, self.min_thresh, self.infrate,
+        (self.learnrate, self.theta, self.min_thresh, self.infrate, self.nunits,
                 self.niter, self.adapt, self.max_iter, self.tolerance) = params
 
     def get_param_list(self):
@@ -194,6 +194,7 @@ class LCALearner(dictlearner.DictLearner):
                 'infrate': self.infrate,
                 'niter': self.niter,
                 'adapt': self.adapt,
+                'nunits': self.nunits
                 'max_iter': self.max_iter,
                 'tolerance': self.tolerance,
                 }
