@@ -72,6 +72,7 @@ class LCALearner(dictlearner.DictLearner):
         self.max_iter = max_iter
         self.gpu = gpu
         self.meanacts = np.zeros(nunits)
+        self.stimshape = stimshape
 
         super().__init__(data, learnrate, nunits, paramfile = paramfile, theta=theta, moving_avg_rate=moving_avg_rate,
                             stimshape=stimshape, datatype=datatype, batch_size=batch_size, pca=pca)
