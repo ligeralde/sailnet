@@ -40,6 +40,12 @@ class DictLearner(object):
         self._load_stims(data, datatype, stimshape, pca)
 
         self.Q = self.rand_dict()
+        self.Qhistory.append(self.Q)
+        # try:
+        #     self.Q0
+        # except AttributeError:
+        #     self.Q0 = self.Q
+        #     self.Q0norm = np.linalg.norm(self.Q0, axis=1)
 
     def initialize_stats(self):
         nunits = self.nunits
@@ -52,6 +58,13 @@ class DictLearner(object):
         self.L2acts = np.zeros(nunits)
         self.errorhist = np.array([])
         self.meanacts = np.zeros_like(self.L0acts)
+        self.Qhistory = []
+        self.dQhistory = []
+        self.Qoverlaphistory = []
+        self.dQtotalhistory = []
+        self.Qtotaloverlaphistory = []
+        self.Qsmoothnesshistory = []
+        self.L1usagehistory = []
 
     def _load_stims(self, data, datatype, stimshape, pca):
         if isinstance(data, stimset.StimSet):
@@ -148,15 +161,41 @@ class DictLearner(object):
     def run(self, ntrials=1000, batch_size=None,
             rate_decay=None, normalize=True):
         batch_size = batch_size or self.stims.batch_size
+        Q0 = self.Qhistory[0]
+        Q0norm = np.linalg.norm(Q0, axis=1)
         for trial in range(ntrials):
             X = self.stims.rand_stim(batch_size=batch_size)
             acts, _, _ = self.infer(X)
             thiserror = self.learn(X, acts, normalize)
-
             if trial % self.store_every == 0:
                 if trial % 50 == 0 or self.store_every > 50:
                     print(trial)
                 self.store_statistics(acts, thiserror, batch_size)
+                #track rfs
+                self.Qhistory.append(self.Q)
+                #get previous recorded RF
+                oldQ = self.Qhistory[-2]
+                #track 'displacement' of RF from 50 iterations ago
+                self.dQhistory.append(np.linalg.norm(self.Q-oldQ,axis=1))
+                #track overlap of RF from 50 iterations ago
+                oldQnorm = np.linalg.norm(oldQ, axis=1)
+                newQnorm = np.linalg.norm(self.Q, axis=1)
+                self.Qoverlaphistory.append(np.einsum('ij,ij->i', self.Q, oldQ)/oldQnorm/newQnorm)
+                #track 'displacement' of each RF from initialization
+                self.dQtotalhistory.append(np.linalg.norm(self.Q-Q0,axis=1))
+                #track overlap of each RF with its initialization
+                self.Qtotaloverlaphistory.append(np.einsum('ij,ij->i', self.Q, Q0)/Q0norm/np.linalg.norm(self.Q, axis=1))
+                #track mean smoothness of each RF
+                grads = [np.gradient(self.Q[i,:].reshape(self.stimshape)) for i in range(self.nunits)]
+                smoothness = []
+                for grad_pair in grads:
+                    smoothness.append(np.sqrt(grad_pair[0]**2+grad_pair[1]**2).mean())
+                self.Qsmoothnesshistory.append(np.array(smoothness))
+                #track L1 usage
+                L1usage = np.linalg.norm(acts, ord=1, axis=1)
+                self.L1usagehistory.append(L1usage)
+                #save current Q value for dQ tracking
+                # oldQ = self.Q
 
             if (trial % 1000 == 0 or trial+1 == ntrials) and trial != 0:
                 try:
@@ -359,6 +398,13 @@ class DictLearner(object):
                 'L0acts': self.L0acts,
                 'L1acts': self.L1acts,
                 'L2acts': self.L2acts,
+                'Qhistory': self.Qhistory
+                'dQhistory': self.dQhistory,
+                'Qoverlaphistory': self.Qoverlaphistory,
+                'dQtotalhistory': self.dQtotalhistory,
+                'Qtotaloverlaphistory': self.Qtotaloverlaphistory,
+                'Qsmoothnesshistory': self.Qsmoothnesshistory,
+                'L1usagehistory': self.L1usagehistory,
                 'meanacts': self.meanacts}
 
     def set_histories(self, histories):
@@ -385,3 +431,5 @@ class DictLearner(object):
         (self.errorhist, self.meanacts, self.L0acts, self.L0hist,
          self.L1acts, self.L1hist, self.L2hist, self.L2acts,
          self.corrmatrix_ave) = histories
+
+

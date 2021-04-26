@@ -114,20 +114,20 @@ class SAILnet(dictlearner.DictLearner):
         self.Q = self.rand_dict()
         self.W = np.zeros((self.nunits, self.nunits))
         self.theta = theta0*np.ones(self.nunits)
-        if len(self.errorhist) == 0:
-            self.Q0 = self.Q
-            self.Q0norm = np.linalg.norm(self.Q0, axis=1)
+        # if len(self.errorhist) == 0:
+        #     self.Q0 = self.Q
+        #     self.Q0norm = np.linalg.norm(self.Q0, axis=1)
         # initialize average activity stats
         self.initialize_stats()
         self.corrmatrix_ave = self.p**2
         self.objhistory = []
         self.actshistory = []
-        self.dQhistory = []
-        self.Qoverlaphistory = []
-        self.dQtotalhistory = []
-        self.Qtotaloverlaphistory = []
-        self.Qsmoothnesshistory = []
-        self.L1usagehistory = []
+        # self.dQhistory = []
+        # self.Qoverlaphistory = []
+        # self.dQtotalhistory = []
+        # self.Qtotaloverlaphistory = []
+        # self.Qsmoothnesshistory = []
+        # self.L1usagehistory = []
         self.rfWcorrhistory = []
         self.Whistory = []
         self.rfoverlaphistory = []
@@ -258,12 +258,13 @@ class SAILnet(dictlearner.DictLearner):
                 #track L1 usage
                 L1usage = np.linalg.norm(acts, ord=1, axis=1)
                 self.L1usagehistory.append(L1usage)
+                #save current Q value for dQ tracking
+                oldQ = self.Q
 
             else:
                 corrmatrix = self.compute_corrmatrix(acts, errors, acts.mean(1)) #computing corrmatrix, no storing
 
-            #save current Q value for dQ tracking
-            oldQ = self.Q
+
 
             self.learn(X, acts, corrmatrix)
 
@@ -379,18 +380,20 @@ class SAILnet(dictlearner.DictLearner):
                 'batch_size': self.batch_size,
                 'paramfile': self.paramfile,
                 'niter': self.niter,
+                # 'Q0': self.Q0,
+                # 'Q0norm': self.Q0norm,
                 'infrate': self.infrate}
 
     def get_histories(self):
         histories = super().get_histories()
         histories['objhistory'] = self.objhistory
         histories['actshistory'] = self.actshistory
-        histories['dQhistory'] = self.dQhistory
-        histories['Qoverlaphistory'] = self.Qoverlaphistory
-        histories['dQtotalhistory'] = self.dQtotalhistory
-        histories['Qtotaloverlaphistory'] = self.Qtotaloverlaphistory
-        histories['Qsmoothnesshistory'] = self.Qsmoothnesshistory
-        histories['L1usagehistory'] = self.L1usagehistory
+        # histories['dQhistory'] = self.dQhistory
+        # histories['Qoverlaphistory'] = self.Qoverlaphistory
+        # histories['dQtotalhistory'] = self.dQtotalhistory
+        # histories['Qtotaloverlaphistory'] = self.Qtotaloverlaphistory
+        # histories['Qsmoothnesshistory'] = self.Qsmoothnesshistory
+        # histories['L1usagehistory'] = self.L1usagehistory
         histories['rfWcorrhistory'] = self.rfWcorrhistory
         histories['Whistory'] = self.Whistory
         histories['rfoverlaphistory'] = self.rfoverlaphistory

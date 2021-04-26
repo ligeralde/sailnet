@@ -17,11 +17,25 @@ except ImportError:
 
 class LCALearner(dictlearner.DictLearner):
 
-    def __init__(self, data, nunits, learnrate=None, theta = 0.022,
-                 batch_size = 100, infrate=.01,
-                 niter=300, min_thresh=0.4, adapt=0.95, tolerance = .01, max_iter=4,
-                 softthresh = False, datatype = "image", moving_avg_rate=.001,
-                 pca = None, stimshape = None, paramfile = None, gpu=False):
+    def __init__(self,
+                 data,
+                 datatype = "image",
+                 stimshape = None,
+                 batch_size = 100,
+                 niter=50,
+                 nunits=256,
+                 learnrate=.001,
+                 infrate=.01,
+                 theta = 0.022,
+                 min_thresh=0.4,
+                 adapt=0.95,
+                 tolerance = .01,
+                 max_iter=4,
+                 softthresh = True, #L1 sparsity
+                 moving_avg_rate=.001,
+                 pca = None,
+                 paramfile = None,
+                 gpu=False):
         """
         An LCALearner is a dictionary learner (DictLearner) that uses a Locally Competitive Algorithm (LCA) for inference.
         By default the LCALearner optimizes for sparsity as measured by the L0 pseudo-norm of the activities of the units
@@ -170,8 +184,54 @@ class LCALearner(dictlearner.DictLearner):
                 self.niter, self.adapt, self.max_iter, self.tolerance) = params
 
     def get_param_list(self):
-        return (self.learnrate, self.theta, self.min_thresh, self.infrate,
-                  self.niter, self.adapt, self.max_iter, self.tolerance)
+        return {'learnrate': self.learnrate,
+                'theta': self.theta,
+                'min_thresh': self.min_thresh,
+                'infrate': self.infrate,
+                'niter': self.niter,
+                'adapt': self.adapt,
+                'max_iter': self.max_iter,
+                'tolerance': self.tolerance,
+                # 'Q0': self.Q0,
+                # 'Q0norm': self.Q0norm}
+    def set_histories(self, histories):
+        super().set_histories(histories)
+
+    def _old_load(self, filename=None):
+        """Load parameters (e.g., weights) from a previous run from pickle file.
+        This pickle file is then associated with this instance of SAILnet."""
+        if filename is None:
+            filename = self.paramfile
+        with open(filename, 'rb') as f: self.Q, param_dict, stat_dict = pickle.load(f) #self.theta, rates, histories = pickle.load(f)
+        self.theta = param_dict['theta']
+        self.W = param_dict['W']
+        self.alpha = param_dict['alpha']
+        self.beta = param_dict['beta']
+        self.gamma = param_dict['gamma']
+        self.infrate = param_dict['infrate']
+        self.nunits = param_dict['nunits']
+        self.p = param_dict['p']
+        self.L0acts = stat_dict['L0acts']
+        self.L1acts = stat_dict['L1acts']
+        self.L2acts = stat_dict['L2acts']
+        self.L0hist = stat_dict['L0hist']
+        self.L1hist = stat_dict['L1hist']
+        self.L2hist = stat_dict['L2hist']
+        self.corrmatrix_ave = stat_dict['corrmatrix_ave']
+        self.errorhist = stat_dict['errorhist']
+        # self.objhistory = stat_dict['objhistory']
+        # self.actshistory = stat_dict['actshistory']
+        self.Qhistory = stat_dict['Qhistory']
+        self.dQhistory = stat_dict['dQhistory']
+        self.Qoverlaphistory = stat_dict['Qoverlaphistory']
+        self.dQtotalhistory = stat_dict['dQtotalhistory']
+        self.Qtotaloverlaphistory = stat_dict['Qtotaloverlaphistory']
+        self.Qsmoothnesshistory = stat_dict['Qsmoothnesshistory']
+        self.L1usagehistory = stat_dict['L1usagehistory']
+        # self.rfWcorrhistory = stat_dict['rfWcorrhistory']
+        # self.Whistory = stat_dict['Whistory']
+        # self.rfoverlaphistory = stat_dict['rfoverlaphistory']
+        # self.datahistory= stat_dict['datahistory']
 
     def load(self, filename=None):
         """Loads the parameters that were saved. For older files when I saved less, loads what I saved then."""
