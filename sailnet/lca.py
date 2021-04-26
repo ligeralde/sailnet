@@ -22,6 +22,7 @@ class LCALearner(dictlearner.DictLearner):
                  datatype = "image",
                  stimshape = None,
                  batch_size = 100,
+                 store_every = 50,
                  niter=50,
                  nunits=256,
                  learnrate=.001,
