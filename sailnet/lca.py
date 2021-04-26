@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from . import dictlearner
 import pickle
 try:
-    import LCAonGPU
+    from . import lcaGPU
 except ImportError:
     print("Unable to load GPU implementation. Only CPU inference available.")
 
