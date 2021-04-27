@@ -111,7 +111,7 @@ class SAILnet(dictlearner.DictLearner):
         # Q are feedfoward weights (i.e. from input units to output units)
         # W are horizontal conections (among 'output' units)
         # theta are thresholds for the LIF neurons
-        self.Q = self.rand_dict()
+        # self.Q = self.rand_dict()
         self.W = np.zeros((self.nunits, self.nunits))
         self.theta = theta0*np.ones(self.nunits)
         # if len(self.errorhist) == 0:
@@ -215,7 +215,10 @@ class SAILnet(dictlearner.DictLearner):
         # self.Whistory = np.zeros((self.nunits*(self.nunits-1)/2, ntrials//self.store_every))
         # self.rfWcorrhistory_slice = np.zeros(ntrials//self.store_every)
         # self.datahistory_slice = np.zeros((self.batch_size, ntrials))
+        Q0 = self.Qhistory[0]
+        Q0norm = np.linalg.norm(Q0, axis=1)
         for t in range(ntrials):
+
             if datatracking == True:
                 X, idxs = self.stims.rand_stim(track=datatracking) #(256, 100) matrix, each column a ravelled patch
                 self.datahistory.append(idxs)
@@ -223,12 +226,35 @@ class SAILnet(dictlearner.DictLearner):
                 X = self.stims.rand_stim(track=datatracking)
 
             acts = self.infer(X) #(1536, 100) matrix, each column the activities for every unit
-
             errors = np.mean(self.compute_errors(acts, X)) #(256, 100) matrix = X - Q^T * acts
             if t % self.store_every == 0:
                 corrmatrix = self.store_statistics(acts, errors) #for storing and computing corrmatrix
                 self.objhistory.append(self.compute_objective(acts, X))
                 self.actshistory.append(np.mean(acts, axis=1))
+                if t > 0:
+                    #get previous recorded RF
+                    oldQ = self.Qhistory[-1]
+                    self.Qhistory.append(self.Q)
+                    #track 'displacement' of RF from 50 iterations ago
+                    self.dQhistory.append(np.linalg.norm(self.Q-oldQ,axis=1))
+                    #track overlap of RF from 50 iterations ago
+                    oldQnorm = np.linalg.norm(oldQ, axis=1)
+                    newQnorm = np.linalg.norm(self.Q, axis=1)
+                    self.Qoverlaphistory.append(np.einsum('ij,ij->i', self.Q, oldQ)/oldQnorm/newQnorm)
+                    #track 'displacement' of each RF from initialization
+                    self.dQtotalhistory.append(np.linalg.norm(self.Q-Q0,axis=1))
+                    #track overlap of each RF with its initialization
+                    self.Qtotaloverlaphistory.append(np.einsum('ij,ij->i', self.Q, Q0)/Q0norm/np.linalg.norm(self.Q, axis=1))
+                    #track mean smoothness of each RF
+                    grads = [np.gradient(self.Q[i,:].reshape(self.stimshape)) for i in range(self.nunits)]
+                    smoothness = []
+                    for grad_pair in grads:
+                        smoothness.append(np.sqrt(grad_pair[0]**2+grad_pair[1]**2).mean())
+                    self.Qsmoothnesshistory.append(np.array(smoothness))
+                    #track L1 usage
+                    L1usage = np.linalg.norm(acts, ord=1, axis=1)
+                    self.L1usagehistory.append(L1usage)
+                    #track W related quantities
                 if Wtracking == True:
                     mask = self.W[np.triu_indices(self.nunits,k=1)] > 0
                     W = self.W[np.triu_indices(self.nunits,k=1)][mask]
@@ -245,37 +271,18 @@ class SAILnet(dictlearner.DictLearner):
                             rfWcorr = np.dot(W, rfoverlaps)/(np.sqrt(np.sum(W**2))*np.sqrt(np.sum(rfoverlaps**2)))
                             self.rfWcorrhistory.append(rfWcorr)
 
-                #track 'displacement' of each RF from initialization
-                self.dQtotalhistory.append(np.linalg.norm(self.Q-self.Q0,axis=1))
-                #track overlap of each RF with its initialization
-                self.Qtotaloverlaphistory.append(np.einsum('ij,ij->i', self.Q, self.Q0)/self.Q0norm/np.linalg.norm(self.Q, axis=1))
-                #track mean smoothness of each RF
-                grads = [np.gradient(self.Q[i,:].reshape(self.stimshape)) for i in range(self.nunits)]
-                smoothness = []
-                for grad_pair in grads:
-                    smoothness.append(np.sqrt(grad_pair[0]**2+grad_pair[1]**2).mean())
-                self.Qsmoothnesshistory.append(np.array(smoothness))
-                #track L1 usage
-                L1usage = np.linalg.norm(acts, ord=1, axis=1)
-                self.L1usagehistory.append(L1usage)
-                #save current Q value for dQ tracking
-                oldQ = self.Q
-
             else:
                 corrmatrix = self.compute_corrmatrix(acts, errors, acts.mean(1)) #computing corrmatrix, no storing
 
-
-
             self.learn(X, acts, corrmatrix)
 
-            if t % self.store_every == 0:
-                self.dQhistory.append(np.linalg.norm(self.Q-oldQ,axis=1))
-                oldQnorm = np.linalg.norm(oldQ, axis=1)
-                newQnorm = np.linalg.norm(self.Q, axis=1)
-                self.Qoverlaphistory.append(np.einsum('ij,ij->i', self.Q, oldQ)/oldQnorm/newQnorm)
 
 
-
+            # if t % self.store_every == 0:
+            #     self.dQhistory.append(np.linalg.norm(self.Q-oldQ,axis=1))
+            #     oldQnorm = np.linalg.norm(oldQ, axis=1)
+            #     newQnorm = np.linalg.norm(self.Q, axis=1)
+            #     self.Qoverlaphistory.append(np.einsum('ij,ij->i', self.Q, oldQ)/oldQnorm/newQnorm)
             if t % 50 == 0:
                 print("Trial number: " + str(t))
                 if t % 5000 == 0:
@@ -308,12 +315,15 @@ class SAILnet(dictlearner.DictLearner):
 
     def compute_objective(self, acts, X):
         """Compute value of objective/Lagrangian averaged over batch."""
+        errorterm, rateterm, corrterm = self.compute_objective_terms(acts, X)
+        return (errorterm + rateterm + corrterm)
+
+    def compute_objective_terms(self, acts, X):
         errorterm = np.mean(self.compute_errors(acts, X))
         rateterm = np.mean((acts-self.p)*self.theta[:, np.newaxis])
         corrWmatrix = (acts-self.p).T.dot(self.W).dot(acts-self.p)
         corrterm = (1/acts.shape[1]**2)*np.trace(corrWmatrix)
-        return (errorterm*self.beta/2 + rateterm*self.gamma +
-                corrterm*self.alpha)
+        return errorterm, rateterm, corrterm
 
     def adjust_rates(self, factor):
         """Multiply all the learning rates (alpha, beta, gamma) by factor."""
