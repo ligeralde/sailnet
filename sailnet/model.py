@@ -119,6 +119,8 @@ class SAILnet(dictlearner.DictLearner):
         #     self.Q0norm = np.linalg.norm(self.Q0, axis=1)
         # initialize average activity stats
         self.initialize_stats()
+        self.Q = self.rand_dict()
+        self.Qhistory.append(self.Q)
         self.corrmatrix_ave = self.p**2
         self.objhistory = []
         self.actshistory = []
