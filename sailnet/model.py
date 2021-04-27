@@ -231,7 +231,8 @@ class SAILnet(dictlearner.DictLearner):
             errors = np.mean(self.compute_errors(acts, X)) #(256, 100) matrix = X - Q^T * acts
             if t % self.store_every == 0:
                 corrmatrix = self.store_statistics(acts, errors) #for storing and computing corrmatrix
-                self.objhistory.append(self.compute_objective(acts, X))
+                errorterm, rateterm, corrterm = self.compute_objective_terms(acts, X)
+                self.objhistory.append(np.array([errorterm,rateterm,corrterm]))
                 self.actshistory.append(np.mean(acts, axis=1))
                 if t > 0:
                     #get previous recorded RF
