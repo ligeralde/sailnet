@@ -325,7 +325,7 @@ class SAILnet(dictlearner.DictLearner):
         #compute the outer product between the neuron's RF and its activities for the whole batch of data.
         #this gives the generative model for that neuron for each data point in the batch.
         #then take the difference between the data point and the generative model.
-        local_diffs = X[np.newaxis,:]-np.einsum('nd,nb->ndb',self.Q,acts))**2
+        local_diffs = (X[np.newaxis,:]-np.einsum('nd,nb->ndb',self.Q,acts))**2
         #return the average of the differences across pixels and datapoints. values close to 1 typically signify
         #that the the neuron is not firing at all (generative model = 0).
         return local_diffs.mean(axis=1).mean(axis=1)
