@@ -123,6 +123,7 @@ class SAILnet(dictlearner.DictLearner):
         self.Qhistory.append(self.Q)
         self.corrmatrix_ave = self.p**2
         self.objhistory = []
+        self.independenterrorhist = []
         self.actshistory = []
         # self.dQhistory = []
         # self.Qoverlaphistory = []
@@ -220,7 +221,6 @@ class SAILnet(dictlearner.DictLearner):
         Q0 = self.Qhistory[0]
         Q0norm = np.linalg.norm(Q0, axis=1)
         for t in range(ntrials):
-
             if datatracking == True:
                 X, idxs = self.stims.rand_stim(track=datatracking) #(256, 100) matrix, each column a ravelled patch
                 self.datahistory.append(idxs)
@@ -232,6 +232,8 @@ class SAILnet(dictlearner.DictLearner):
             if t % self.store_every == 0:
                 corrmatrix = self.store_statistics(acts, errors) #for storing and computing corrmatrix
                 errorterm, rateterm, corrterm = self.compute_objective_terms(acts, X)
+                independent_errors = self.compute_local_error(acts, X)
+                self.independenterrorhist.append(independent_errors)
                 self.objhistory.append(np.array([errorterm,rateterm,corrterm]))
                 self.actshistory.append(np.mean(acts, axis=1))
                 if t > 0:
@@ -316,13 +318,25 @@ class SAILnet(dictlearner.DictLearner):
         diffs = X - self.generate_model(acts)
         return np.mean(diffs**2, axis=0)/np.mean(X**2, axis=0)
 
+    def compute_local_error(self, acts, X):
+        """Given a batch of data and activities, compute the squared error between
+        the generative model for each neuron and the original data.
+        Returns vector of each neuron's error."""
+        #compute the outer product between the neuron's RF and its activities for the whole batch of data.
+        #this gives the generative model for that neuron for each data point in the batch.
+        #then take the difference between the data point and the generative model.
+        local_diffs = X[np.newaxis,:]-np.einsum('nd,nb->ndb',self.Q,acts))**2
+        #return the average of the differences across pixels and datapoints. values close to 1 typically signify
+        #that the the neuron is not firing at all (generative model = 0).
+        return local_diffs.mean(axis=1).mean(axis=1)
+
     def compute_objective(self, acts, X):
         """Compute value of objective/Lagrangian averaged over batch."""
         errorterm, rateterm, corrterm = self.compute_objective_terms(acts, X)
         return (errorterm + rateterm + corrterm)
 
     def compute_objective_terms(self, acts, X):
-        errorterm = np.mean(self.compute_errors(acts, X))
+        errorterm = np.mean(self.compute_errors(acts,X))
         rateterm = np.mean((acts-self.p)*self.theta[:, np.newaxis])
         corrWmatrix = (acts-self.p).T.dot(self.W).dot(acts-self.p)
         corrterm = (1/acts.shape[1]**2)*np.trace(corrWmatrix)
@@ -400,6 +414,7 @@ class SAILnet(dictlearner.DictLearner):
     def get_histories(self):
         histories = super().get_histories()
         histories['objhistory'] = self.objhistory
+        histories['independenterrorhist'] = self.independenterrorhist
         histories['actshistory'] = self.actshistory
         # histories['dQhistory'] = self.dQhistory
         # histories['Qoverlaphistory'] = self.Qoverlaphistory
@@ -416,6 +431,7 @@ class SAILnet(dictlearner.DictLearner):
     def set_histories(self, histories):
         super().set_histories(histories)
         self.objhistory = histories['objhistory']
+        self.independenterrorhist = histories['independenterrorhist']
 
     # legacy code for convenience loading old pickle files
     def _old_save(self, filename=None):
@@ -458,6 +474,7 @@ class SAILnet(dictlearner.DictLearner):
         self.corrmatrix_ave = stat_dict['corrmatrix_ave']
         self.errorhist = stat_dict['errorhist']
         self.objhistory = stat_dict['objhistory']
+        self.independenterrorhist = stat_dict['independenterrorhist']
         self.actshistory = stat_dict['actshistory']
         self.dQhistory = stat_dict['dQhistory']
         self.Qoverlaphistory = stat_dict['Qoverlaphistory']
