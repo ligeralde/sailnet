@@ -476,6 +476,7 @@ class SAILnet(dictlearner.DictLearner):
         self.objhistory = stat_dict['objhistory']
         self.independenterrorhist = stat_dict['independenterrorhist']
         self.actshistory = stat_dict['actshistory']
+        self.Qhistory = stat_dict['Qhistory']
         self.dQhistory = stat_dict['dQhistory']
         self.Qoverlaphistory = stat_dict['Qoverlaphistory']
         self.dQtotalhistory = stat_dict['dQtotalhistory']
