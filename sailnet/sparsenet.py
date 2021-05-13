@@ -33,7 +33,7 @@ class Sparsenet(dictlearner.DictLearner):
                  # sigma=.316,
                  # gain_rate=0.02,
                  # var_eta=0.1,
-                 **kwargs):
+                 ):
 
         #niter: number of inference time steps
         #lamb: sparseness hyperparameter (1/noise_var)
