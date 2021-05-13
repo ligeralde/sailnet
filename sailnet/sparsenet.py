@@ -93,7 +93,7 @@ class Sparsenet(dictlearner.DictLearner):
         # gradient = self.gradient(X)
         dictnorms = np.sum(self.Q**2,axis=1)
         acts0 = lambda x : self.Q.dot(x)/dictnorms
-        acts_final = [optimize.fmin_cg(self.objective(acts0(x), x), acts0(x), fprime=self.gradient, x, maxiter=self.cg_maxiter) for x in X_list]
+        acts_final = [fmin_cg(self.objective(acts0(x), x), acts0(x), fprime=self.gradient, args=x, maxiter=self.cg_maxiter) for x in X_list]
         # phi_sq = self.Q.dot(self.Q.T)
         # QX = self.Q.dot(X)
         # for k in range(self.niter):
