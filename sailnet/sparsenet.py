@@ -50,7 +50,7 @@ class Sparsenet(dictlearner.DictLearner):
         self.niter=niter
         self.lamb = lamb
         # self.infrate=infrate
-        self.measure = measure
+        # self.measure = measure
         self.var_goal = var_goal
         self.sigma = sigma
         self.gains = np.ones(nunits)
