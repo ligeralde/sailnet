@@ -1,7 +1,7 @@
 from . import dictlearner
 
 import numpy as np
-from scipy import optimize
+from scipy.optimize import fmin_cg
 try:
     import matplotlib.pyplot as plt
 except ImportError:
@@ -10,9 +10,30 @@ except ImportError:
 class Sparsenet(dictlearner.DictLearner):
     """A sparse dictionary learner based on (Olshausen and Field, 1996)."""
 
-    def __init__(self, data, nunits, eta=1, measure='abs', infrate=1,
-                 niter=200, lamb=.01, var_goal=0.1, sigma=.316, gain_rate=0.02,
-                 var_eta=0.1, **kwargs):
+    def __init__(self,
+                 data,
+                 datatype="image",
+                 stimshape=None,
+                 batch_size=100,
+                 store_every=1000,
+                 niter=150,
+                 nunits=256,
+                 gamma=0.01,
+                 lamb=0.3,
+                 eta=0.1,
+                 adapt=0.96,
+                 eta_gd=0.01,
+                 cg_maxiter=20,
+                 cg_epsilon=1e-8,
+                 cg_gtol=1e-4
+                 # measure='abs',
+                 # infrate=1,,
+
+                 # var_goal=0.1,
+                 # sigma=.316,
+                 # gain_rate=0.02,
+                 # var_eta=0.1,
+                 **kwargs):
 
         #niter: number of inference time steps
         #lamb: sparseness hyperparameter (1/noise_var)
@@ -48,20 +69,20 @@ class Sparsenet(dictlearner.DictLearner):
         elif self.measure == 'bell':
             return 2*acts*np.exp(-acts**2)
 
-    def objective(self, X):
-        X_hat = lambda acts : self.Q.T.dot(acts)
-        error = lambda acts : 0.5*np.linalg.norm(X-X_hat(acts))**2
+    def objective(self, acts, X):
+        X_hat = self.Q.T.dot(acts)
+        error = 0.5*np.linalg.norm(X-X_hat(acts))**2
         if self.measure == 'log':
-            return lambda acts : np.sum(np.log(1+(acts/self.sigma)**2)) + error(acts)
+            return np.sum(np.log(1+(acts/self.sigma)**2)) + error
         elif self.measure == 'abs':
-            return lambda acts : np.sum(np.abs(acts/self.sigma)) + error(acts)
+            return np.sum(np.abs(acts/self.sigma)) + error
         elif self.measure == 'bell':
-            return lambda acts : np.sum(-np.exp(-(acts/self.sigma)**2)) + error(acts)
+            return np.sum(-np.exp(-(acts/self.sigma)**2)) + error
 
-    def gradient(self, X):
+    def gradient(self, acts, X):
         QX = self.Q.dot(X)
         gramian = self.Q.dot(self.Q.T)
-        return lambda acts : QX - gramian.dot(acts) - self.lamb/self.sigma*self.dSda(acts/self.sigma)
+        return QX - gramian.dot(acts) - self.lamb/self.sigma*self.dSda(acts/self.sigma)
 
     def infer(self, X, infplot=False):
         X_list = [X[:,i] for i in range(np.shape(X)[1])]
@@ -72,7 +93,7 @@ class Sparsenet(dictlearner.DictLearner):
         # gradient = self.gradient(X)
         dictnorms = np.sum(self.Q**2,axis=1)
         acts0 = lambda x : self.Q.dot(x)/dictnorms
-        acts_final = [optimize.fmin_cg(self.objective(x), acts0(x), fprime=self.gradient(x)) for x in X_list]
+        acts_final = [optimize.fmin_cg(self.objective(acts0(x), x), acts0(x), fprime=self.gradient, x, maxiter=seflf.cg_maxiter), for x in X_list]
         # phi_sq = self.Q.dot(self.Q.T)
         # QX = self.Q.dot(X)
         # for k in range(self.niter):

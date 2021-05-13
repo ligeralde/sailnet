@@ -1,7 +1,7 @@
 """
 Created on Thu Aug 20 15:48:46 2015
 @author: Eric Dodds
-(Inference method adapted from code by Jesse Livezey)
+(Inference method adapted from code by Jesse Livez ey)
 Dictionary learner that uses LCA for inference and gradient descent for learning.
 (Intended for static inputs)
 """
