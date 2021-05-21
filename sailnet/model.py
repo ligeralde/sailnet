@@ -130,7 +130,7 @@ class SAILnet(dictlearner.DictLearner):
         # self.dQtotalhistory = []
         # self.Qtotaloverlaphistory = []
         # self.Qsmoothnesshistory = []
-        # self.L1usagehistory = []
+        # self.L1movingavghistory = []
         self.rfWcorrhistory = []
         self.Whistory = []
         self.rfoverlaphistory = []
@@ -236,6 +236,13 @@ class SAILnet(dictlearner.DictLearner):
                 self.independenterrorhist.append(independent_errors)
                 self.objhistory.append(np.array([errorterm,rateterm,corrterm]))
                 self.actshistory.append(np.mean(acts, axis=1))
+                if t == 0:
+                    self.dQhistory.append(np.zeros(self.nunits))
+                    self.Qoverlaphistory.append(np.ones(self.nunits))
+                    self.dQtotalhistory.append(np.zeros(self.nunits))
+                    self.Qtotaloverlaphistory.append(np.ones(self.nunits))
+                    self.L1movingavghistory.append(self.L1acts)
+
                 if t > 0:
                     #get previous recorded RF
                     oldQ = self.Qhistory[-1]
@@ -257,8 +264,8 @@ class SAILnet(dictlearner.DictLearner):
                         smoothness.append(np.sqrt(grad_pair[0]**2+grad_pair[1]**2).mean())
                     self.Qsmoothnesshistory.append(np.array(smoothness))
                     #track L1 usage
-                    L1usage = np.linalg.norm(acts, ord=1, axis=1)
-                    self.L1usagehistory.append(L1usage)
+                    # L1usage = np.linalg.norm(acts, ord=1, axis=1)
+                    self.L1movingavghistory.append(self.L1acts)
                     #track W related quantities
                 if Wtracking == True:
                     mask = self.W[np.triu_indices(self.nunits,k=1)] > 0
@@ -421,7 +428,7 @@ class SAILnet(dictlearner.DictLearner):
         # histories['dQtotalhistory'] = self.dQtotalhistory
         # histories['Qtotaloverlaphistory'] = self.Qtotaloverlaphistory
         # histories['Qsmoothnesshistory'] = self.Qsmoothnesshistory
-        # histories['L1usagehistory'] = self.L1usagehistory
+        # histories['L1movingavghistory'] = self.L1movingavghistory
         histories['rfWcorrhistory'] = self.rfWcorrhistory
         histories['Whistory'] = self.Whistory
         histories['rfoverlaphistory'] = self.rfoverlaphistory
@@ -482,7 +489,7 @@ class SAILnet(dictlearner.DictLearner):
         self.dQtotalhistory = stat_dict['dQtotalhistory']
         self.Qtotaloverlaphistory = stat_dict['Qtotaloverlaphistory']
         self.Qsmoothnesshistory = stat_dict['Qsmoothnesshistory']
-        self.L1usagehistory = stat_dict['L1usagehistory']
+        self.L1movingavghistory = stat_dict['L1movingavghistory']
         self.rfWcorrhistory = stat_dict['rfWcorrhistory']
         self.Whistory = stat_dict['Whistory']
         self.rfoverlaphistory = stat_dict['rfoverlaphistory']

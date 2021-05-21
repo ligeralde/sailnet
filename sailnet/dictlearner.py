@@ -64,7 +64,7 @@ class DictLearner(object):
         self.dQtotalhistory = []
         self.Qtotaloverlaphistory = []
         self.Qsmoothnesshistory = []
-        self.L1usagehistory = []
+        self.L1movingavghistory = []
 
     def _load_stims(self, data, datatype, stimshape, pca):
         if isinstance(data, stimset.StimSet):
@@ -193,7 +193,7 @@ class DictLearner(object):
                 self.Qsmoothnesshistory.append(np.array(smoothness))
                 #track L1 usage
                 L1usage = np.linalg.norm(acts, ord=1, axis=1)
-                self.L1usagehistory.append(L1usage)
+                self.L1movingavghistory.append(self.L1acts)
                 #save current Q value for dQ tracking
                 # oldQ = self.Q
 
@@ -404,7 +404,7 @@ class DictLearner(object):
                 'dQtotalhistory': self.dQtotalhistory,
                 'Qtotaloverlaphistory': self.Qtotaloverlaphistory,
                 'Qsmoothnesshistory': self.Qsmoothnesshistory,
-                'L1usagehistory': self.L1usagehistory,
+                'L1movingavghistory': self.L1movingavghistory,
                 'meanacts': self.meanacts}
 
     def set_histories(self, histories):
