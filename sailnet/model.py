@@ -44,7 +44,10 @@ class SAILnet(dictlearner.DictLearner):
                  alpha=.1,
                  beta=0.001,
                  gamma=0.01,
-                 theta0=0.5,
+                 Q0mu=0,
+                 Q0std=1,
+                 theta0mu=2,
+                 theta0std=0,
                  infrate=0.1,
                  moving_avg_rate=0.001,
                  paramfile='SAILnetparams.pickle',
@@ -95,6 +98,10 @@ class SAILnet(dictlearner.DictLearner):
         self.nunits = nunits  # M in original MATLAB code
         self.paramfile = paramfile
         self.pca = pca
+        self.theta0mu = theta0mu
+        self.theta0std = theta0std
+        self.Q0mu = Q0mu
+        self.Q0std = Q0std
         self.plotter = plotting.Plotter(self)
         self.ninput = ninput  # N in original MATLAB code
         self.stimshape = stimshape
@@ -104,22 +111,22 @@ class SAILnet(dictlearner.DictLearner):
 
         self._load_stims(data, datatype, self.stimshape, self.pca)
 
-        self.initialize(theta0)
+        self.initialize()
 
-    def initialize(self, theta0=0.5):
+    def initialize(self):
         """Initialize or reset weights, averages, histories."""
         # Q are feedfoward weights (i.e. from input units to output units)
         # W are horizontal conections (among 'output' units)
         # theta are thresholds for the LIF neurons
         # self.Q = self.rand_dict()
         self.W = np.zeros((self.nunits, self.nunits))
-        self.theta = theta0*np.ones(self.nunits)
+        self.theta = self.theta0mu+self.theta0std*np.random.randn(self.nunits)
         # if len(self.errorhist) == 0:
         #     self.Q0 = self.Q
         #     self.Q0norm = np.linalg.norm(self.Q0, axis=1)
         # initialize average activity stats
         self.initialize_stats()
-        self.Q = self.rand_dict()
+        self.Q = self.rand_dict(mu=self.Q0mu,std=self.Q0std)
         self.Qhistory.append(self.Q)
         self.corrmatrix_ave = self.p**2
         self.objhistory = []

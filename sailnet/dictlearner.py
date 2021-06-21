@@ -285,8 +285,8 @@ class DictLearner(object):
         if savestr is not None:
             plt.savefig(savestr, bbox_inches='tight')
 
-    def rand_dict(self):
-        Q = np.random.randn(self.nunits, self.stims.datasize)
+    def rand_dict(self, mu=0, std=1):
+        Q = mu+std*np.random.randn(self.nunits, self.stims.datasize)
         return (np.diag(1/np.sqrt(np.sum(Q**2, 1)))).dot(Q)
 
     def adjust_rates(self, factor):
