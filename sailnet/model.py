@@ -44,10 +44,10 @@ class SAILnet(dictlearner.DictLearner):
                  alpha=.1,
                  beta=0.001,
                  gamma=0.01,
-                 Q0mu=0,
-                 Q0std=1,
+                 W0mu=0,
+                 W0var=1,
                  theta0mu=2,
-                 theta0std=0,
+                 theta0var=0,
                  infrate=0.1,
                  moving_avg_rate=0.001,
                  paramfile='SAILnetparams.pickle',
@@ -99,9 +99,9 @@ class SAILnet(dictlearner.DictLearner):
         self.paramfile = paramfile
         self.pca = pca
         self.theta0mu = theta0mu
-        self.theta0std = theta0std
-        self.Q0mu = Q0mu
-        self.Q0std = Q0std
+        self.theta0var = theta0var
+        self.W0mu = W0mu
+        self.W0var = W0var
         self.plotter = plotting.Plotter(self)
         self.ninput = ninput  # N in original MATLAB code
         self.stimshape = stimshape
@@ -119,14 +119,14 @@ class SAILnet(dictlearner.DictLearner):
         # W are horizontal conections (among 'output' units)
         # theta are thresholds for the LIF neurons
         # self.Q = self.rand_dict()
-        self.W = np.zeros((self.nunits, self.nunits))
-        self.theta = self.theta0mu+self.theta0std*np.random.randn(self.nunits)
+        self.W = self.W0mu+np.sqrt(self.W0var)*np.random.randn(self.nunits, self.nunits)
+        self.theta = self.theta0mu+np.sqrt(self.theta0var)*np.random.randn(self.nunits)
         # if len(self.errorhist) == 0:
         #     self.Q0 = self.Q
         #     self.Q0norm = np.linalg.norm(self.Q0, axis=1)
         # initialize average activity stats
         self.initialize_stats()
-        self.Q = self.rand_dict(mu=self.Q0mu,std=self.Q0std)
+        self.Q = self.rand_dict()
         self.Qhistory.append(self.Q)
         self.corrmatrix_ave = self.p**2
         self.objhistory = []
