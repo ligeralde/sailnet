@@ -46,6 +46,7 @@ class SAILnet(dictlearner.DictLearner):
                  gamma=0.01,
                  W0mu=0,
                  W0var=1,
+                 theta0range=None,
                  theta0mu=2,
                  theta0var=0,
                  infrate=0.1,
@@ -98,6 +99,7 @@ class SAILnet(dictlearner.DictLearner):
         self.nunits = nunits  # M in original MATLAB code
         self.paramfile = paramfile
         self.pca = pca
+        self.theta0range = theta0range
         self.theta0mu = theta0mu
         self.theta0var = theta0var
         self.W0mu = W0mu
@@ -121,7 +123,11 @@ class SAILnet(dictlearner.DictLearner):
         # self.Q = self.rand_dict()
         neglogW = self.W0mu+np.sqrt(self.W0var)*np.random.randn(self.nunits, self.nunits)
         self.W = np.tril(np.exp(-neglogW)) + np.tril(np.exp(-neglogW),-1).T
-        self.theta = self.theta0mu+np.sqrt(self.theta0var)*np.random.randn(self.nunits)
+        self.W = self.W - np.diag(np.diag(self.W))
+        if self.theta0range == None:
+            self.theta = self.theta0mu+np.sqrt(self.theta0var)*np.random.rand(self.nunits)
+        else:
+            self.theta = np.random.uniform(theta0range[0],theta0range[1],self.nunits)
         # if len(self.errorhist) == 0:
         #     self.Q0 = self.Q
         #     self.Q0norm = np.linalg.norm(self.Q0, axis=1)
