@@ -119,7 +119,8 @@ class SAILnet(dictlearner.DictLearner):
         # W are horizontal conections (among 'output' units)
         # theta are thresholds for the LIF neurons
         # self.Q = self.rand_dict()
-        self.W = self.W0mu+np.sqrt(self.W0var)*np.random.randn(self.nunits, self.nunits)
+        neglogW = self.W0mu+np.sqrt(self.W0var)*np.random.randn(self.nunits, self.nunits)
+        self.W = np.tril(np.exp(-neglogW)) + np.tril(np.exp(-neglogW),-1).T
         self.theta = self.theta0mu+np.sqrt(self.theta0var)*np.random.randn(self.nunits)
         # if len(self.errorhist) == 0:
         #     self.Q0 = self.Q
