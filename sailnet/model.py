@@ -127,7 +127,7 @@ class SAILnet(dictlearner.DictLearner):
         if self.theta0range == None:
             self.theta = self.theta0mu+np.sqrt(self.theta0var)*np.random.rand(self.nunits)
         else:
-            self.theta = np.random.uniform(theta0range[0],theta0range[1],self.nunits)
+            self.theta = np.random.uniform(self.theta0range[0],self.theta0range[1],self.nunits)
         # if len(self.errorhist) == 0:
         #     self.Q0 = self.Q
         #     self.Q0norm = np.linalg.norm(self.Q0, axis=1)
