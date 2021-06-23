@@ -132,12 +132,7 @@ class SAILnet(dictlearner.DictLearner):
         self.objhistory = []
         self.independenterrorhist = []
         self.actshistory = []
-        # self.dQhistory = []
-        # self.Qoverlaphistory = []
-        # self.dQtotalhistory = []
-        # self.Qtotaloverlaphistory = []
-        # self.Qsmoothnesshistory = []
-        # self.L1movingavghistory = []
+        self.Sahistory = []
         self.rfWcorrhistory = []
         self.Whistory = []
         self.rfoverlaphistory = []
@@ -227,6 +222,7 @@ class SAILnet(dictlearner.DictLearner):
         # self.datahistory_slice = np.zeros((self.batch_size, ntrials))
         Q0 = self.Qhistory[0]
         Q0norm = np.linalg.norm(Q0, axis=1)
+        acts_bin = np.zeros(self.nunits)
         for t in range(ntrials):
             if datatracking == True:
                 X, idxs = self.stims.rand_stim(track=datatracking) #(256, 100) matrix, each column a ravelled patch
@@ -235,6 +231,7 @@ class SAILnet(dictlearner.DictLearner):
                 X = self.stims.rand_stim(track=datatracking)
 
             acts = self.infer(X) #(1536, 100) matrix, each column the activities for every unit
+            acts_bin += np.sum(acts,axis=1)
             errors = np.mean(self.compute_errors(acts, X)) #(256, 100) matrix = X - Q^T * acts
             if t % self.store_every == 0:
                 corrmatrix = self.store_statistics(acts, errors) #for storing and computing corrmatrix
@@ -242,7 +239,9 @@ class SAILnet(dictlearner.DictLearner):
                 independent_errors = self.compute_local_error(acts, X)
                 self.independenterrorhist.append(independent_errors)
                 self.objhistory.append(np.array([errorterm,rateterm,corrterm]))
-                self.actshistory.append(np.mean(acts, axis=1))
+                self.Sahistory.append(1-np.mean(np.where(acts_bin > 6)))
+                acts_bin = np.zeros(self.nunits) #reset acts bin
+                # self.actshistory.append(np.mean(acts, axis=1))
                 if t == 0:
                     self.dQhistory.append(np.zeros(self.nunits))
                     self.Qoverlaphistory.append(np.ones(self.nunits))
@@ -430,6 +429,7 @@ class SAILnet(dictlearner.DictLearner):
         histories['objhistory'] = self.objhistory
         histories['independenterrorhist'] = self.independenterrorhist
         histories['actshistory'] = self.actshistory
+        histories['Sahistory'] = self.Sahistory
         # histories['dQhistory'] = self.dQhistory
         # histories['Qoverlaphistory'] = self.Qoverlaphistory
         # histories['dQtotalhistory'] = self.dQtotalhistory
@@ -490,6 +490,7 @@ class SAILnet(dictlearner.DictLearner):
         self.objhistory = stat_dict['objhistory']
         self.independenterrorhist = stat_dict['independenterrorhist']
         self.actshistory = stat_dict['actshistory']
+        self.Sahistory = stat_dict['Sahistory']
         self.Qhistory = stat_dict['Qhistory']
         self.dQhistory = stat_dict['dQhistory']
         self.Qoverlaphistory = stat_dict['Qoverlaphistory']
