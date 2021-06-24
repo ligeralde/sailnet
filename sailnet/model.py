@@ -247,7 +247,7 @@ class SAILnet(dictlearner.DictLearner):
                 self.independenterrorhist.append(independent_errors)
                 self.objhistory.append(np.array([errorterm,rateterm,corrterm]))
                 multiunit_bin = np.sum((acts_bin/500).reshape(-1,8),axis=1) #multiunit activities averaged over 500 stims
-                self.Sahistory.append(1-np.sum(np.where(multiunit_bin > 4))/500)
+                self.Sahistory.append(1-np.sum(np.where(multiunit_bin > 0))/500)
                 acts_bin = np.zeros(self.nunits) #reset acts bin
                 # self.actshistory.append(np.mean(acts, axis=1))
                 if t == 0:
