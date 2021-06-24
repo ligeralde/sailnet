@@ -238,7 +238,7 @@ class SAILnet(dictlearner.DictLearner):
                 X = self.stims.rand_stim(track=datatracking)
 
             acts = self.infer(X) #(1536, 100) matrix, each column the activities for every unit
-            acts_bin += np.sum(acts,axis=1)
+            acts_bin += np.sum(acts,axis=1) #sum over 100 stimuli
             errors = np.mean(self.compute_errors(acts, X)) #(256, 100) matrix = X - Q^T * acts
             if t % self.store_every == 0:
                 corrmatrix = self.store_statistics(acts, errors) #for storing and computing corrmatrix
@@ -246,7 +246,8 @@ class SAILnet(dictlearner.DictLearner):
                 independent_errors = self.compute_local_error(acts, X)
                 self.independenterrorhist.append(independent_errors)
                 self.objhistory.append(np.array([errorterm,rateterm,corrterm]))
-                self.Sahistory.append(1-np.mean(np.where(acts_bin > 6)))
+                multiunit_bin = np.sum(acts_bin.reshape(-1,8),axis=1)/500 #multiunit activities averaged over 500 stims
+                self.Sahistory.append(1-np.sum(np.where(multiunit_bin > 4))/32)
                 acts_bin = np.zeros(self.nunits) #reset acts bin
                 # self.actshistory.append(np.mean(acts, axis=1))
                 if t == 0:
