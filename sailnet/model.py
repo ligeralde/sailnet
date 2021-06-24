@@ -49,6 +49,7 @@ class SAILnet(dictlearner.DictLearner):
                  theta0range=None,
                  theta0mu=2,
                  theta0var=0,
+                 Sa_thresh = 1,
                  infrate=0.1,
                  moving_avg_rate=0.001,
                  paramfile='SAILnetparams.pickle',
@@ -104,6 +105,7 @@ class SAILnet(dictlearner.DictLearner):
         self.theta0var = theta0var
         self.W0mu = W0mu
         self.W0var = W0var
+        self.Sa_thresh = Sa_thresh
         self.plotter = plotting.Plotter(self)
         self.ninput = ninput  # N in original MATLAB code
         self.stimshape = stimshape
@@ -247,7 +249,7 @@ class SAILnet(dictlearner.DictLearner):
                 self.independenterrorhist.append(independent_errors)
                 self.objhistory.append(np.array([errorterm,rateterm,corrterm]))
                 multiunit_bin = np.sum((acts_bin/500).reshape(-1,8),axis=1) #multiunit activities averaged over 500 stims
-                self.Sahistory.append(1-(multiunit_bin > 4).sum()/32)
+                self.Sahistory.append(1-(multiunit_bin > self.Sa_thresh).sum()/32)
                 acts_bin = np.zeros(self.nunits) #reset acts bin
                 # self.actshistory.append(np.mean(acts, axis=1))
                 if t == 0:
