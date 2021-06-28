@@ -256,7 +256,7 @@ class SAILnet(dictlearner.DictLearner):
                 errorterm, rateterm, corrterm = self.compute_objective_terms(acts, X)
                 independent_errors = self.compute_local_error(acts, X)
                 self.independenterrorhist.append(independent_errors)
-  `             self.objhistory.append(np.array([errorterm,rateterm,corrterm]))
+                self.objhistory.append(np.array([errorterm,rateterm,corrterm]))
                 # multiunit_bin = np.sum((acts_bin/500).reshape(-1,8),axis=1) #multiunit activities averaged over 500 stims
                 # self.Sahistory.append(1-(multiunit_bin > self.Sa_thresh).sum()/32)
                 # acts_bin = np.zeros(self.nunits) #reset acts bin
