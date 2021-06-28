@@ -141,7 +141,16 @@ class SAILnet(dictlearner.DictLearner):
         self.objhistory = []
         self.independenterrorhist = []
         self.actshistory = []
-        self.Sahistory = []
+# <<<<<<< HEAD
+#         self.Sahistory = []
+# =======
+        # self.dQhistory = []
+        # self.Qoverlaphistory = []
+        # self.dQtotalhistory = []
+        # self.Qtotaloverlaphistory = []
+        # self.Qsmoothnesshistory = []
+        # self.L1usagehistory = []
+# >>>>>>> parent of a6b0b1e (Fixed histories initialization and changed L1 history to moving average)
         self.rfWcorrhistory = []
         self.Whistory = []
         self.rfoverlaphistory = []
@@ -240,17 +249,17 @@ class SAILnet(dictlearner.DictLearner):
                 X = self.stims.rand_stim(track=datatracking)
 
             acts = self.infer(X) #(1536, 100) matrix, each column the activities for every unit
-            acts_bin += np.sum(acts,axis=1) #sum over 100 stimuli
+            # acts_bin += np.sum(acts,axis=1) #sum over 100 stimuli
             errors = np.mean(self.compute_errors(acts, X)) #(256, 100) matrix = X - Q^T * acts
             if t % self.store_every == 0:
                 corrmatrix = self.store_statistics(acts, errors) #for storing and computing corrmatrix
                 errorterm, rateterm, corrterm = self.compute_objective_terms(acts, X)
                 independent_errors = self.compute_local_error(acts, X)
                 self.independenterrorhist.append(independent_errors)
-                self.objhistory.append(np.array([errorterm,rateterm,corrterm]))
-                multiunit_bin = np.sum((acts_bin/500).reshape(-1,8),axis=1) #multiunit activities averaged over 500 stims
-                self.Sahistory.append(1-(multiunit_bin > self.Sa_thresh).sum()/32)
-                acts_bin = np.zeros(self.nunits) #reset acts bin
+  `             self.objhistory.append(np.array([errorterm,rateterm,corrterm]))
+                # multiunit_bin = np.sum((acts_bin/500).reshape(-1,8),axis=1) #multiunit activities averaged over 500 stims
+                # self.Sahistory.append(1-(multiunit_bin > self.Sa_thresh).sum()/32)
+                # acts_bin = np.zeros(self.nunits) #reset acts bin
                 # self.actshistory.append(np.mean(acts, axis=1))
                 if t == 0:
                     self.dQhistory.append(np.zeros(self.nunits))
@@ -259,6 +268,9 @@ class SAILnet(dictlearner.DictLearner):
                     self.Qtotaloverlaphistory.append(np.ones(self.nunits))
                     self.L1movingavghistory.append(self.L1acts)
 
+=======
+                self.actshistory.append(np.mean(acts, axis=1))
+>>>>>>> parent of a6b0b1e (Fixed histories initialization and changed L1 history to moving average)
                 if t > 0:
                     #get previous recorded RF
                     oldQ = self.Qhistory[-1]
@@ -280,8 +292,8 @@ class SAILnet(dictlearner.DictLearner):
                         smoothness.append(np.sqrt(grad_pair[0]**2+grad_pair[1]**2).mean())
                     self.Qsmoothnesshistory.append(np.array(smoothness))
                     #track L1 usage
-                    # L1usage = np.linalg.norm(acts, ord=1, axis=1)
-                    self.L1movingavghistory.append(self.L1acts)
+                    L1usage = np.linalg.norm(acts, ord=1, axis=1)
+                    self.L1usagehistory.append(L1usage)
                     #track W related quantities
                 if Wtracking == True:
                     mask = self.W[np.triu_indices(self.nunits,k=1)] > 0
@@ -439,13 +451,13 @@ class SAILnet(dictlearner.DictLearner):
         histories['objhistory'] = self.objhistory
         histories['independenterrorhist'] = self.independenterrorhist
         histories['actshistory'] = self.actshistory
-        histories['Sahistory'] = self.Sahistory
+        # histories['Sahistory'] = self.Sahistory
         # histories['dQhistory'] = self.dQhistory
         # histories['Qoverlaphistory'] = self.Qoverlaphistory
         # histories['dQtotalhistory'] = self.dQtotalhistory
         # histories['Qtotaloverlaphistory'] = self.Qtotaloverlaphistory
         # histories['Qsmoothnesshistory'] = self.Qsmoothnesshistory
-        # histories['L1movingavghistory'] = self.L1movingavghistory
+        # histories['L1usagehistory'] = self.L1usagehistory
         histories['rfWcorrhistory'] = self.rfWcorrhistory
         histories['Whistory'] = self.Whistory
         histories['rfoverlaphistory'] = self.rfoverlaphistory
@@ -500,14 +512,14 @@ class SAILnet(dictlearner.DictLearner):
         self.objhistory = stat_dict['objhistory']
         self.independenterrorhist = stat_dict['independenterrorhist']
         self.actshistory = stat_dict['actshistory']
-        self.Sahistory = stat_dict['Sahistory']
+        # self.Sahistory = stat_dict['Sahistory']
         self.Qhistory = stat_dict['Qhistory']
         self.dQhistory = stat_dict['dQhistory']
         self.Qoverlaphistory = stat_dict['Qoverlaphistory']
         self.dQtotalhistory = stat_dict['dQtotalhistory']
         self.Qtotaloverlaphistory = stat_dict['Qtotaloverlaphistory']
         self.Qsmoothnesshistory = stat_dict['Qsmoothnesshistory']
-        self.L1movingavghistory = stat_dict['L1movingavghistory']
+        self.L1usagehistory = stat_dict['L1usagehistory']
         self.rfWcorrhistory = stat_dict['rfWcorrhistory']
         self.Whistory = stat_dict['Whistory']
         self.rfoverlaphistory = stat_dict['rfoverlaphistory']
