@@ -518,11 +518,11 @@ class SAILnet(dictlearner.DictLearner):
         self.dQtotalhistory = stat_dict['dQtotalhistory']
         self.Qtotaloverlaphistory = stat_dict['Qtotaloverlaphistory']
         self.Qsmoothnesshistory = stat_dict['Qsmoothnesshistory']
-        self.L1usagehistory = stat_dict['L1usagehistory']
-        self.rfWcorrhistory = stat_dict['rfWcorrhistory']
-        self.Whistory = stat_dict['Whistory']
+        # self.L1usagehistory = stat_dict['L1usagehistory']
+        # self.rfWcorrhistory = stat_dict['rfWcorrhistory']
+        # self.Whistory = stat_dict['Whistory']
         self.rfoverlaphistory = stat_dict['rfoverlaphistory']
-        self.datahistory= stat_dict['datahistory']
+        # self.datahistory= stat_dict['datahistory']
         # with open(filename, 'rb') as f:
         #     self.Q, self.W, self.theta, rates, histories = pickle.load(f)
         # try:
