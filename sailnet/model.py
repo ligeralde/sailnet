@@ -267,10 +267,9 @@ class SAILnet(dictlearner.DictLearner):
                     self.dQtotalhistory.append(np.zeros(self.nunits))
                     self.Qtotaloverlaphistory.append(np.ones(self.nunits))
                     self.L1movingavghistory.append(self.L1acts)
-
-=======
+# =======
                 self.actshistory.append(np.mean(acts, axis=1))
->>>>>>> parent of a6b0b1e (Fixed histories initialization and changed L1 history to moving average)
+# >>>>>>> parent of a6b0b1e (Fixed histories initialization and changed L1 history to moving average)
                 if t > 0:
                     #get previous recorded RF
                     oldQ = self.Qhistory[-1]
