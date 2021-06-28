@@ -151,10 +151,10 @@ class SAILnet(dictlearner.DictLearner):
         # self.Qsmoothnesshistory = []
         # self.L1usagehistory = []
 # >>>>>>> parent of a6b0b1e (Fixed histories initialization and changed L1 history to moving average)
-        self.rfWcorrhistory = []
-        self.Whistory = []
-        self.rfoverlaphistory = []
-        self.datahistory = []
+        # self.rfWcorrhistory = []
+        # self.Whistory = []
+        # self.rfoverlaphistory = []
+        # self.datahistory = []
 
 
     def infer(self, X, infplot=False, savestr=None):
