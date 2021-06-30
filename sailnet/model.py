@@ -149,7 +149,7 @@ class SAILnet(dictlearner.DictLearner):
         # self.dQtotalhistory = []
         # self.Qtotaloverlaphistory = []
         # self.Qsmoothnesshistory = []
-        # self.L1usagehistory = []
+        self.L1usagehistory = []
 # >>>>>>> parent of a6b0b1e (Fixed histories initialization and changed L1 history to moving average)
         # self.rfWcorrhistory = []
         # self.Whistory = []
@@ -456,7 +456,7 @@ class SAILnet(dictlearner.DictLearner):
         # histories['dQtotalhistory'] = self.dQtotalhistory
         # histories['Qtotaloverlaphistory'] = self.Qtotaloverlaphistory
         # histories['Qsmoothnesshistory'] = self.Qsmoothnesshistory
-        # histories['L1usagehistory'] = self.L1usagehistory
+        histories['L1usagehistory'] = self.L1usagehistory
         # histories['rfWcorrhistory'] = self.rfWcorrhistory
         # histories['Whistory'] = self.Whistory
         # histories['rfoverlaphistory'] = self.rfoverlaphistory
@@ -519,7 +519,7 @@ class SAILnet(dictlearner.DictLearner):
         self.Qtotaloverlaphistory = stat_dict['Qtotaloverlaphistory']
         self.Qsmoothnesshistory = stat_dict['Qsmoothnesshistory']
         self.L1movingavghistory = stat_dict['L1movingavghistory']
-        # self.L1usagehistory = stat_dict['L1usagehistory']
+        self.L1usagehistory = stat_dict['L1usagehistory']
         # self.rfWcorrhistory = stat_dict['rfWcorrhistory']
         # self.Whistory = stat_dict['Whistory']
         # self.rfoverlaphistory = stat_dict['rfoverlaphistory']
