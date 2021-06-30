@@ -261,14 +261,14 @@ class SAILnet(dictlearner.DictLearner):
                 # self.Sahistory.append(1-(multiunit_bin > self.Sa_thresh).sum()/32)
                 # acts_bin = np.zeros(self.nunits) #reset acts bin
                 # self.actshistory.append(np.mean(acts, axis=1))
-                if t == 0:
+                if t == 0 and len(self.errorhist) == 0:
                     self.dQhistory.append(np.zeros(self.nunits))
                     self.Qoverlaphistory.append(np.ones(self.nunits))
                     self.dQtotalhistory.append(np.zeros(self.nunits))
                     self.Qtotaloverlaphistory.append(np.ones(self.nunits))
                     self.L1movingavghistory.append(self.L1acts)
 # =======
-                self.actshistory.append(np.mean(acts, axis=1))
+                # self.actshistory.append(np.mean(acts, axis=1))
 # >>>>>>> parent of a6b0b1e (Fixed histories initialization and changed L1 history to moving average)
                 if t > 0:
                     #get previous recorded RF
@@ -449,7 +449,7 @@ class SAILnet(dictlearner.DictLearner):
         histories = super().get_histories()
         histories['objhistory'] = self.objhistory
         histories['independenterrorhist'] = self.independenterrorhist
-        histories['actshistory'] = self.actshistory
+        # histories['actshistory'] = self.actshistory
         # histories['Sahistory'] = self.Sahistory
         # histories['dQhistory'] = self.dQhistory
         # histories['Qoverlaphistory'] = self.Qoverlaphistory
@@ -458,9 +458,9 @@ class SAILnet(dictlearner.DictLearner):
         # histories['Qsmoothnesshistory'] = self.Qsmoothnesshistory
         # histories['L1usagehistory'] = self.L1usagehistory
         # histories['rfWcorrhistory'] = self.rfWcorrhistory
-        histories['Whistory'] = self.Whistory
-        histories['rfoverlaphistory'] = self.rfoverlaphistory
-        histories['datahistory'] = self.datahistory
+        # histories['Whistory'] = self.Whistory
+        # histories['rfoverlaphistory'] = self.rfoverlaphistory
+        # histories['datahistory'] = self.datahistory
         return histories
 
     def set_histories(self, histories):
