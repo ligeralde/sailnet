@@ -371,9 +371,13 @@ class SAILnet(dictlearner.DictLearner):
 
     def compute_objective_terms(self, acts, X):
         errorterm = np.mean(self.compute_errors(acts,X))
-        rateterm = np.mean((acts-self.p)*self.theta[:, np.newaxis])
-        corrWmatrix = (acts-self.p).T.dot(self.W).dot(acts-self.p)
-        corrterm = (1/acts.shape[1]**2)*np.trace(corrWmatrix)
+        # rateterm = np.mean((acts-self.p)*self.theta[:, np.newaxis])
+        rateterm = np.mean((acts-self.p))
+        # corrWmatrix = (acts-self.p).T.dot(self.W).dot(acts-self.p)
+        # corrterm = (1/acts.shape[1]**2)*np.trace(corrWmatrix)
+        actsprod = acts.dot(acts)
+        pairsofunits = np.triu_indices(np.shape(acts)[0],1,np.shape(acts)[0])
+        corrterm = (actsprod[pairsofunits]-self.p**2).ravel().mean()
         return errorterm, rateterm, corrterm
 
     def adjust_rates(self, factor):
