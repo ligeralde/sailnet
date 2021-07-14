@@ -375,7 +375,7 @@ class SAILnet(dictlearner.DictLearner):
         rateterm = np.mean((acts-self.p))
         # corrWmatrix = (acts-self.p).T.dot(self.W).dot(acts-self.p)
         # corrterm = (1/acts.shape[1]**2)*np.trace(corrWmatrix)
-        actsprod = acts.dot(acts)
+        actsprod = acts.dot(acts.T)
         pairsofunits = np.triu_indices(np.shape(acts)[0],1,np.shape(acts)[0])
         corrterm = (actsprod[pairsofunits]-self.p**2).ravel().mean()
         return errorterm, rateterm, corrterm
