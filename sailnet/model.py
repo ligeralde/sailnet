@@ -275,21 +275,21 @@ class SAILnet(dictlearner.DictLearner):
                     oldQ = self.Qhistory[-1]
                     self.Qhistory.append(self.Q)
                     #track 'displacement' of RF from 50 iterations ago
-                    self.dQhistory.append(np.linalg.norm(self.Q-oldQ,axis=1))
+                    # self.dQhistory.append(np.linalg.norm(self.Q-oldQ,axis=1))
                     #track overlap of RF from 50 iterations ago
-                    oldQnorm = np.linalg.norm(oldQ, axis=1)
-                    newQnorm = np.linalg.norm(self.Q, axis=1)
-                    self.Qoverlaphistory.append(np.einsum('ij,ij->i', self.Q, oldQ)/oldQnorm/newQnorm)
+                    # oldQnorm = np.linalg.norm(oldQ, axis=1)
+                    # newQnorm = np.linalg.norm(self.Q, axis=1)
+                    # self.Qoverlaphistory.append(np.einsum('ij,ij->i', self.Q, oldQ)/oldQnorm/newQnorm)
                     #track 'displacement' of each RF from initialization
-                    self.dQtotalhistory.append(np.linalg.norm(self.Q-Q0,axis=1))
+                    # self.dQtotalhistory.append(np.linalg.norm(self.Q-Q0,axis=1))
                     #track overlap of each RF with its initialization
-                    self.Qtotaloverlaphistory.append(np.einsum('ij,ij->i', self.Q, Q0)/Q0norm/np.linalg.norm(self.Q, axis=1))
+                    # self.Qtotaloverlaphistory.append(np.einsum('ij,ij->i', self.Q, Q0)/Q0norm/np.linalg.norm(self.Q, axis=1))
                     #track mean smoothness of each RF
-                    grads = [np.gradient(self.Q[i,:].reshape(self.stimshape)) for i in range(self.nunits)]
-                    smoothness = []
-                    for grad_pair in grads:
-                        smoothness.append(np.sqrt(grad_pair[0]**2+grad_pair[1]**2).mean())
-                    self.Qsmoothnesshistory.append(np.array(smoothness))
+                    # grads = [np.gradient(self.Q[i,:].reshape(self.stimshape)) for i in range(self.nunits)]
+                    # smoothness = []
+                    # for grad_pair in grads:
+                        # smoothness.append(np.sqrt(grad_pair[0]**2+grad_pair[1]**2).mean())
+                    # self.Qsmoothnesshistory.append(np.array(smoothness))
                     #track L1 usage
                     L1usage = np.linalg.norm(acts, ord=1, axis=1)
                     self.L1usagehistory.append(L1usage)
