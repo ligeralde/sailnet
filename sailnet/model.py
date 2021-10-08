@@ -226,6 +226,7 @@ class SAILnet(dictlearner.DictLearner):
         dtheta = self.gamma*(np.sum(acts, 1)/self.batch_size - self.p)
         self.theta = self.theta + dtheta
 
+
     def run(self, ntrials=25000, datatracking=False, Wtracking=False, rate_decay=1):
         """
         Run SAILnet for ntrials: for each trial, create a random set of image
@@ -262,17 +263,17 @@ class SAILnet(dictlearner.DictLearner):
                 # acts_bin = np.zeros(self.nunits) #reset acts bin
                 # self.actshistory.append(np.mean(acts, axis=1))
                 if t == 0 and len(self.errorhist) == 0:
-                    self.dQhistory.append(np.zeros(self.nunits))
-                    self.Qoverlaphistory.append(np.ones(self.nunits))
-                    self.dQtotalhistory.append(np.zeros(self.nunits))
-                    self.Qtotaloverlaphistory.append(np.ones(self.nunits))
+                    # self.dQhistory.append(np.zeros(self.nunits))
+                    # self.Qoverlaphistory.append(np.ones(self.nunits))
+                    # self.dQtotalhistory.append(np.zeros(self.nunits))
+                    # self.Qtotaloverlaphistory.append(np.ones(self.nunits))
                     self.L1movingavghistory.append(self.L1acts)
 # =======
                 # self.actshistory.append(np.mean(acts, axis=1))
 # >>>>>>> parent of a6b0b1e (Fixed histories initialization and changed L1 history to moving average)
                 if t > 0 or len(self.Qhistory) > 1:
                     #get previous recorded RF
-                    oldQ = self.Qhistory[-1]
+                    # oldQ = self.Qhistory[-1]
                     self.Qhistory.append(self.Q)
                     #track 'displacement' of RF from 50 iterations ago
                     # self.dQhistory.append(np.linalg.norm(self.Q-oldQ,axis=1))
